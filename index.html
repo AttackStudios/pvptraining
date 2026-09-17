@@ -7,7 +7,7 @@
 <meta name="description" content="A desktop app and Fabric 1.21.11 mod that drop you into a ready-made practice world with bots that fight like players. Mace and Crystal, with Spear and Elytra + Mace skill branches." />
 <meta property="og:title" content="PVPTraining" />
 <meta property="og:description" content="Train Mace and Crystal PvP against bots that fight like players. Fabric 1.21.11." />
-<meta property="og:image" content="https://attackstudios.github.io/pvptraining/assets/shot-train.png" />
+<meta property="og:image" content="https://attackstudios.github.io/pvptraining/assets/shot-train.jpg" />
 <link rel="icon" href="assets/icon.png" />
 <style>
 :root{--bg:#090b10;--surface:rgba(255,255,255,.035);--surface2:rgba(255,255,255,.06);--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);--text:#eef1f7;--text2:#a4acbd;--text3:#6b7385;--ember:#ff6a3d;--ember2:#ffb23e;--mace:#ffb23e;--crystal:#e86bff;--spear:#35e0c2;--ely:#7aa5ff;--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.56,.64,1)}
@@ -82,7 +82,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 <div class="glow a"></div><div class="glow b"></div>
 
 <header><div class="wrap nav">
-  <a class="brand" href="#top"><img src="assets/icon.png" alt="" />PVP<b>Training</b></a>
+  <a class="brand" href="#top"><img src="assets/icon.png" alt="" /><span>PVP<b>Training</b></span></a>
   <nav class="links"><a href="#how">How it works</a><a href="#modes">Gamemodes</a><a href="#setup">Install</a><a href="#download">Download</a><a href="#faq">FAQ</a></nav>
   <span class="pill" title="More versions are coming. For now it is Fabric 1.21.11 only."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Fabric 1.21.11</span>
 </div></header>
@@ -97,7 +97,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
     <a class="btn" href="#how">See how it works</a>
   </div>
   <p class="sub">Free. Windows and macOS. Needs Minecraft Java 1.21.11 with Fabric.</p>
-  <div class="shot reveal"><img src="assets/shot-train.png" alt="The PVPTraining app connected to Minecraft, showing the Mace and Crystal gamemodes" /></div>
+  <div class="shot reveal"><img src="assets/shot-train.jpg" alt="The PVPTraining app connected to Minecraft, showing the Mace and Crystal gamemodes" /></div>
 </div>
 
 <section id="how"><div class="wrap">
@@ -120,7 +120,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
       <span class="kind">Gamemode</span><h3>Mace</h3><p>The base MacePvP kit: Density and Breach maces, wind charges, sword and axe, shield, pearls, and an elytra with no rockets.</p>
       <ul class="drills"><li>Launch &amp; Smash: total smash damage over 10 attempts</li><li>Moving Target: smashes on a dodging dummy in 60 seconds</li><li>Smash Chain: longest back-to-back chain</li></ul></div>
     <div class="card reveal" style="--c:var(--crystal)"><div class="glyph"><svg viewBox="0 0 32 32" fill="none"><path d="M16 3 25 12l-9 17-9-17 9-9Z" fill="currentColor" opacity=".2"/><path d="M16 3 25 12l-9 17-9-17 9-9Z" stroke="currentColor" stroke-width="2.200" stroke-linejoin="round"/><path d="M7 12h18M16 3l-3.500 9L16 29l3.500-17L16 3Z" stroke="currentColor" stroke-width="1.600" stroke-linejoin="round" opacity=".8"/></svg></div>
-      <span class="kind">Gamemode</span><h3>Crystal</h3><p>Standard Crystal PvP kit on an obsidian pit: netherite, totems, end crystals, obsidian, anchors and glowstone.</p>
+      <span class="kind">Gamemode</span><h3>Crystal</h3><p>Standard Crystal PvP kit on real, breakable ground that craters as you fight: netherite, totems, end crystals, obsidian, anchors and glowstone. The bot places obsidian, crystals and anchors, pearls after you, and punishes a popped totem.</p>
       <ul class="drills"><li>Place &amp; Pop: crystals detonated in 30 seconds</li><li>Totem Breaker: pops on a dummy that re-totems instantly</li><li>Under Fire: survive a bot that crystals you non-stop</li></ul></div>
     <div class="card reveal" style="--c:var(--spear)"><div class="glyph"><svg viewBox="0 0 32 32" fill="none"><path d="M5 27 20 12" stroke="currentColor" stroke-width="2.600" stroke-linecap="round"/><path d="M28 4 25.500 13 19 6.500 28 4Z" fill="currentColor" opacity=".25" stroke="currentColor" stroke-width="2.200" stroke-linejoin="round"/></svg></div>
       <span class="kind">Mace branch</span><h3>Spear</h3><p>Mace kit without the elytra, plus a Lunge III spear. Built around attribute swapping: select the spear and jab in the same tick so the lunge cooldown almost disappears.</p>
@@ -133,7 +133,17 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   </div>
   <div class="grid g2" style="align-items:center;margin-top:56px">
     <div class="reveal"><span class="eyebrow">Bots that scale</span><h2 style="font-size:30px">Rookie to Ace</h2><p class="sec-sub">One difficulty number drives reaction time, aim error, crit timing, how often the bot dives, how fast it re-totems and how quickly it places and pops crystals. The Ace spear bot re-lunges as fast as a player who has the swap down.</p></div>
-    <div class="shot reveal" style="margin:0;transform:none"><img src="assets/shot-tree.png" alt="The skill tree: Mace leads to Spear and Elytra + Mace" /></div>
+    <div class="shot reveal" style="margin:0;transform:none"><img src="assets/shot-tree.jpg" alt="The skill tree: Mace leads to Spear and Elytra + Mace" /></div>
+  </div>
+</div></section>
+
+<section id="app"><div class="wrap">
+  <span class="eyebrow">The app</span>
+  <h2>Clean, fast, and it talks back</h2>
+  <p class="sec-sub">Pick a drill and see its medal targets and kit before you start. Every button, connection and medal has its own sound, all generated in the app.</p>
+  <div class="grid g2">
+    <figure class="shot reveal" style="margin:0;transform:none"><img loading="lazy" src="assets/shot-mode.jpg" alt="The Mace page: three drills with medals, the bot ladder, and the kit for the selected drill" /></figure>
+    <figure class="shot reveal" style="margin:0;transform:none"><img loading="lazy" src="assets/shot-guide.jpg" alt="The Lunar Client install guide with the mod file ready to drag out" /></figure>
   </div>
 </div></section>
 
