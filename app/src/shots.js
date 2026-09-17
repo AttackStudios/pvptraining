@@ -45,6 +45,15 @@ async function run(win) {
   await snap('08-tree', `${p}.state.game.session=null; ${p}.goPage('tree', true)`, 2200);
   await snap('09-progress', `${p}.goPage('progress', true)`, 2200);
   await snap('10-setup', `${p}.goPage('setup', true)`);
+  if (process.env.PVPT_SHOTS_SOCIAL) {
+    // needs a signed-in profile and a reachable friends service (see server/standalone.mjs)
+    const click = (sel) => `document.querySelector(${JSON.stringify(sel)})?.click()`;
+    await snap('11-friends', `${p}.state.game.session=null; ${p}.setConn('ready'); ${p}.goPage('friends', true)`, 3000);
+    await snap('12-friend-compare', `(document.querySelector('[data-friend]:has(.unread)') || document.querySelector('[data-friend]'))?.click(); setTimeout(() => ${click('[data-tab="compare"]')}, 600)`, 3600);
+    await snap('13-friend-messages', click('[data-tab="messages"]'), 3000);
+    await snap('14-friend-challenges', click('[data-tab="challenges"]'), 2500);
+    await snap('15-leaderboard', `${p}.goPage('ranks', true)`, 3500);
+  }
   require('electron').app.quit();
 }
 

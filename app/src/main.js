@@ -6,6 +6,7 @@ const { Bridge } = require('./bridge');
 const discovery = require('./discovery');
 const installer = require('./installer');
 const updater = require('./updater');
+const { Social } = require('./social');
 
 const HOME_DIR = path.join(os.homedir(), '.pvptraining');
 const SHOTS = process.argv.includes('--shots');
@@ -14,6 +15,11 @@ const APP_ICON = path.join(__dirname, 'app-icon.png');
 let win = null;
 let bridge = null;
 let lastUpdate = { state: 'idle' };
+const social = new Social({
+  getSettings: () => readSettings(),
+  saveSettings: (patch) => writeSettings({ ...readSettings(), ...patch }),
+  getBridge: () => bridge,
+});
 
 function settingsPath() {
   return path.join(app.getPath('userData'), 'settings.json');
@@ -122,7 +128,12 @@ function wireIpc() {
   ipcMain.handle('bridge:connect', async (_e, instance) => {
     if (bridge) bridge.close();
     bridge = new Bridge(instance);
-    bridge.on('message', (msg) => send('bridge:message', msg));
+    bridge.on('message', (msg) => {
+      social.onBridgeMessage(msg);
+      // a finished drill or duel changes the numbers friends and leaderboards see
+      if (msg.t === 'result') setTimeout(() => social.uploadStats(), 1500);
+      send('bridge:message', msg);
+    });
     bridge.on('status', (status) => send('bridge:status', status));
     return bridge.open();
   });
@@ -144,6 +155,11 @@ function wireIpc() {
     }
     return res;
   });
+  ipcMain.handle('social:state', () => social.state());
+  ipcMain.handle('social:signIn', (_e, name) => social.signIn(name));
+  ipcMain.handle('social:signOut', () => social.signOut());
+  ipcMain.handle('social:api', (_e, method, route, payload) => social.api(method, route, payload));
+  ipcMain.handle('social:upload', () => social.uploadStats());
   ipcMain.handle('update:get', () => lastUpdate);
   ipcMain.handle('update:apply', () => updater.apply(true));
   ipcMain.handle('installer:reveal', () => {
@@ -197,6 +213,7 @@ app.whenReady().then(() => {
   createWindow();
   if (SHOTS) require('./shots').run(win);
   else {
+    social.uploadStats(); // progress made while the app was closed
     updater.run({
       send: (status) => {
         lastUpdate = status;

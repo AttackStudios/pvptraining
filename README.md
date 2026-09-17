@@ -43,6 +43,15 @@ The same sessions can be started in game without the app:
 
 `/kit edit <mace|cpvp|spear|elytra>` hands you the standard kit to rearrange. `/kit save <name> <mode>` stores the whole inventory (every slot, armour, off hand, with enchantments and components) in `~/.pvptraining/kits.json` and makes it the active kit for that mode, so it is what you get whenever a drill or duel starts. `/kit list`, `/kit use <name>`, `/kit load <name>`, `/kit default <mode>` and `/kit delete <name>` manage them. Bots always use the standard kit.
 
+## Friends service
+
+`server/social.mjs` is a dependency-free Node module: accounts, friends, direct messages, stat comparison, leaderboards and 48-hour head-to-head challenges, all in one JSON file. `createSocial({ dataDir })` returns a `(req, res, next)` handler, so it mounts on any Express app or runs alone (`node server/standalone.mjs`). `node server/test.mjs` runs 27 end-to-end checks against a server started with `PVPT_ALLOW_UNVERIFIED=1`.
+
+- **Identity** is a real Minecraft account, proven with the multiplayer handshake: the service issues a nonce, the mod calls `joinServer(uuid, accessToken, nonce)` against Mojang, the service confirms with `hasJoined`. No passwords, the access token never leaves the game, and nobody can register a name they do not own.
+- **Safety**: messages only between mutual, accepted friends; friends are added by code or exact name; remove and block; 300-character limit, word filter, per-user and per-IP rate limits. There is no global chat and no way to message a stranger.
+- **Stats** are uploaded by the app from `~/.pvptraining/progress.json` (without the session history) at launch, on sign-in and after every result. They are self-reported, so leaderboards are for fun rather than proof.
+- **Hosting**: currently mounted at `/pvpt` on the ClaudeBox Render service (`server/pvpt-social.js` there is a copy of `social.mjs`, loaded through a guarded dynamic import). The app's endpoint is `DEFAULT_URL` in `app/src/social.js`, overridable with `PVPT_SOCIAL_URL` or `socialUrl` in settings. The free host sleeps when idle, so the first request can take up to a minute.
+
 ## Auto update
 
 On every launch the app asks the GitHub API for the latest release of this repository. A newer mod jar is downloaded and copied into every mods folder the app previously installed into. A newer app build is downloaded in the background and applied on "Restart to update" or when the app is closed: Windows runs the NSIS installer silently, macOS swaps its own bundle (the builds are unsigned, so Squirrel is not an option). Downloads are verified against the SHA-256 digest GitHub publishes for each asset. Release assets must keep these exact names: `pvptraining-mc1.21.11.jar`, `PVPTraining-win-x64.exe`, `PVPTraining-mac-arm64.zip`, `PVPTraining-mac-x64.zip`.

@@ -1,6 +1,9 @@
 import { icon, hydrateIcons } from './icons.js';
 import { BRANDS, BRAND_ORDER, VIDEO_URL } from './brands.js';
 import { play, setMuted, isMuted, wireGlobalSounds } from './sounds.js';
+import { createSocialUi } from './social-ui.js';
+
+let socialUi = { stopTimers() {}, startBadgePolling() {}, pageFriends() {}, pageRanks() {} };
 
 const api = window.pvpt;
 const stage = document.getElementById('stage');
@@ -241,6 +244,8 @@ const PAGES = [
   { id: 'train', label: 'Train', icon: 'train' },
   { id: 'tree', label: 'Skill tree', icon: 'tree' },
   { id: 'progress', label: 'Progress', icon: 'chart' },
+  { id: 'friends', label: 'Friends', icon: 'friends' },
+  { id: 'ranks', label: 'Leaderboards', icon: 'trophy' },
   { id: 'setup', label: 'Setup', icon: 'gear' },
 ];
 
@@ -263,6 +268,7 @@ function showShell() {
   $$('.nav-item', el).forEach((btn) => (btn.onclick = () => goPage(btn.dataset.page)));
   goPage(state.page, true);
   renderDot();
+  socialUi.startBadgePolling();
 }
 
 function goPage(id, force = false) {
@@ -281,7 +287,8 @@ function renderPage() {
   if (!content) return;
   const el = document.createElement('div');
   el.className = 'page scroll';
-  const builders = { train: state.modeId ? pageMode : pageTrain, tree: pageTree, progress: pageProgress, setup: pageSetup };
+  socialUi.stopTimers();
+  const builders = { train: state.modeId ? pageMode : pageTrain, tree: pageTree, progress: pageProgress, friends: socialUi.pageFriends, ranks: socialUi.pageRanks, setup: pageSetup };
   builders[state.page](el);
   const old = $('.page.in', content);
   content.append(el);
@@ -866,6 +873,7 @@ async function boot() {
   wireGlobalSounds();
   wireSoundToggle();
   wireUpdates();
+  socialUi = createSocialUi({ api, state, $, $$, esc, toast, icon, hydrateIcons, play, modeOf, fmtScore, medalDots, goPage });
   api.bridge.onMessage(onMessage);
   api.bridge.onStatus(onStatus);
   window.__pvpt = { state, showWelcome, showPicker, showGuide, showShell, goPage, renderPage, setConn, onMessage };

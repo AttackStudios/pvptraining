@@ -96,6 +96,32 @@ public class PVPTrainingClient implements ClientModInitializer {
 				});
 			}
 			case "stop" -> onServer(client, (server, player) -> SessionManager.stop());
+			// Proves to the PVPTraining friends service that this really is the account it says it is,
+			// the same way joining a multiplayer server does: we tell Mojang "I am joining <nonce>",
+			// and the service asks Mojang whether that happened. The access token goes to Mojang only;
+			// the app and the friends service never see it.
+			case "socialAuth" -> {
+				String nonce = msg.get("nonce").getAsString();
+				Thread worker = new Thread(() -> {
+					JsonObject reply = new JsonObject();
+					reply.addProperty("t", "socialAuthed");
+					reply.addProperty("nonce", nonce);
+					reply.addProperty("name", client.getSession().getUsername());
+					try {
+						java.util.UUID uuid = client.getSession().getUuidOrNull();
+						if (uuid == null) throw new IllegalStateException("This game is not signed in to a Minecraft account.");
+						client.getApiServices().sessionService().joinServer(uuid, client.getSession().getAccessToken(), nonce);
+						reply.addProperty("ok", true);
+					} catch (Exception e) {
+						reply.addProperty("ok", false);
+						reply.addProperty("error", "Minecraft could not confirm your account. Make sure the game is signed in, then try again.");
+						PVPTraining.LOG.warn("Social sign-in failed: {}", e.toString());
+					}
+					bridge.broadcast(reply);
+				}, "pvptraining-social-auth");
+				worker.setDaemon(true);
+				worker.start();
+			}
 			// Test hook (-Dpvptraining.debug=true only): the trainee punches the nearest bot so an
 			// automated run can check that bots really get knocked back.
 			// Test hook (debug only): run a command as the trainee, so automated runs can drive /kit.
