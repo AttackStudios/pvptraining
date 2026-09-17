@@ -1,0 +1,8 @@
+node_modules/
+.gradle/
+build/
+run/
+dist/
+release/
+*.log
+.DS_Store

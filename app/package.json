@@ -1,0 +1,42 @@
+{
+  "name": "pvptraining",
+  "productName": "PVPTraining",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Combat masterclass for Minecraft 1.21.11: connects to your game and drops you into the practice world.",
+  "author": "AttackStudios",
+  "license": "MIT",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron .",
+    "sync": "node tools/sync.mjs",
+    "shots": "electron . --shots",
+    "dist:mac": "npm run sync && electron-builder --mac --publish never",
+    "dist:win": "npm run sync && electron-builder --win --x64 --publish never",
+    "dist": "npm run sync && electron-builder --mac --win --x64 --publish never"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "devDependencies": {
+    "electron": "^33.3.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "net.attackstudioyt.pvptraining",
+    "productName": "PVPTraining",
+    "copyright": "Copyright © 2026 AttackStudios",
+    "directories": { "output": "release", "buildResources": "build" },
+    "files": ["src/**/*", "renderer/**/*", "package.json"],
+    "extraResources": [{ "from": "resources", "to": "." }],
+    "mac": {
+      "category": "public.app-category.games",
+      "target": [{ "target": "dmg", "arch": ["universal"] }],
+      "identity": null
+    },
+    "dmg": { "title": "PVPTraining" },
+    "win": { "target": [{ "target": "nsis", "arch": ["x64"] }] },
+    "nsis": { "oneClick": true, "perMachine": false, "shortcutName": "PVPTraining" },
+    "artifactName": "PVPTraining-${version}-${os}-${arch}.${ext}"
+  }
+}
