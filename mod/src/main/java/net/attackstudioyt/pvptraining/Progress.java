@@ -66,7 +66,62 @@ public final class Progress {
 		return instance;
 	}
 
+	/**
+	 * Folds whatever is on disk into memory, keeping the better side of everything. The desktop app
+	 * rewrites progress.json when it syncs with the player's account (progress from another device),
+	 * possibly while the game is running, so the game must never blindly overwrite that file.
+	 * Returns the branches that unlocked as a result.
+	 */
+	public synchronized List<String> mergeFromDisk() {
+		Progress disk = null;
+		try {
+			Path file = home().resolve("progress.json");
+			if (Files.exists(file)) disk = GSON.fromJson(Files.readString(file), Progress.class);
+		} catch (Exception e) {
+			PVPTraining.LOG.warn("progress.json could not be merged", e);
+		}
+		if (disk == null || disk.modes == null) return recompute();
+		for (Map.Entry<String, ModeProgress> e : disk.modes.entrySet()) {
+			ModeProgress theirs = e.getValue();
+			if (theirs == null) continue;
+			ModeProgress ours = mode(e.getKey());
+			ours.unlocked |= theirs.unlocked;
+			if (theirs.drills != null) {
+				for (Map.Entry<String, DrillProgress> d : theirs.drills.entrySet()) {
+					DrillProgress q = d.getValue();
+					if (q == null) continue;
+					DrillProgress p = ours.drills.computeIfAbsent(d.getKey(), k -> new DrillProgress());
+					Catalog.Drill def = Catalog.get().drill(e.getKey(), d.getKey());
+					boolean lower = def != null && def.lowerIsBetter;
+					boolean qValid = q.runs > 0 && (!lower || q.best > 0);
+					boolean pValid = p.runs > 0 && (!lower || p.best > 0);
+					if (qValid && (!pValid || (lower ? q.best < p.best : q.best > p.best))) p.best = q.best;
+					p.medal = Math.max(p.medal, q.medal);
+					p.runs = Math.max(p.runs, q.runs);
+				}
+			}
+			if (theirs.duels != null) {
+				for (Map.Entry<String, DuelProgress> d : theirs.duels.entrySet()) {
+					DuelProgress q = d.getValue();
+					if (q == null) continue;
+					DuelProgress p = ours.duels.computeIfAbsent(d.getKey(), k -> new DuelProgress());
+					p.matchWins = Math.max(p.matchWins, q.matchWins);
+					p.matchLosses = Math.max(p.matchLosses, q.matchLosses);
+				}
+			}
+		}
+		if (disk.history != null) {
+			java.util.Set<String> seen = new java.util.HashSet<>();
+			for (Entry h : history) seen.add(h.ts + "|" + h.name);
+			for (Entry h : disk.history) if (h != null && seen.add(h.ts + "|" + h.name)) history.add(h);
+			history.sort(java.util.Comparator.comparingLong(h -> h.ts));
+			while (history.size() > 60) history.remove(0);
+		}
+		return recompute();
+	}
+
 	public synchronized void save() {
+		mergeFromDisk();
 		try {
 			Files.createDirectories(home());
 			Path tmp = home().resolve("progress.json.tmp");

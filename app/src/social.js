@@ -1,6 +1,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { mergeModes, recompute, forUpload, total } = require('./progress-merge');
 
 /**
  * Client for the PVPTraining friends service (friends, messages, stat comparison, leaderboards,
@@ -107,22 +108,59 @@ class Social {
     return { ok: true };
   }
 
-  /** Sends the trainee's progress (without the session history) so friends and leaderboards can see it. */
-  async uploadStats() {
+  /**
+   * Two-way progress sync with the account. This device's progress and the account's copy are
+   * MERGED (best of each drill, medal, duel record and unlock), so nothing is ever overwritten:
+   * a new laptop inherits the PC's progress instead of erasing it, and vice versa.
+   *   1. send local progress; the server merges it into the account and returns the result
+   *   2. merge that back into the local file and recompute mastery from the combined medals
+   *   3. if the recomputed totals differ from what the server has, send them once more
+   *   4. tell the game (if connected) and the UI that progress changed
+   */
+  async sync() {
     if (!this.session?.token) return { ok: false };
     if (process.argv.includes('--shots')) return { ok: true, unchanged: true }; // screenshot runs use seeded sample data
-    let progress;
+    if (this.syncing) return this.syncing;
+    this.syncing = this.runSync().finally(() => {
+      this.syncing = null;
+    });
+    return this.syncing;
+  }
+
+  async runSync() {
+    const file = path.join(process.env.PVPT_HOME || path.join(os.homedir(), '.pvptraining'), 'progress.json');
+    const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'renderer', 'catalog.json'), 'utf8'));
+    let progress = { schema: 1, modes: {}, history: [] };
     try {
-      progress = JSON.parse(fs.readFileSync(path.join(os.homedir(), '.pvptraining', 'progress.json'), 'utf8'));
+      progress = { ...progress, ...JSON.parse(fs.readFileSync(file, 'utf8')) };
     } catch {
-      return { ok: false };
+      /* a brand-new device: nothing local yet, everything comes from the account */
     }
-    const stats = { modes: progress.modes || {} };
-    const encoded = JSON.stringify(stats);
-    if (encoded === this.lastUploaded) return { ok: true, unchanged: true };
-    const res = await this.request('POST', '/stats', { body: { stats } });
-    if (res.ok) this.lastUploaded = encoded;
-    return res;
+    const before = JSON.stringify(progress.modes || {});
+    const first = await this.request('POST', '/stats', { body: { stats: { modes: forUpload(progress.modes, catalog) } } });
+    if (!first.ok) return first;
+
+    const cloud = first.data.stats?.modes || {};
+    for (const mode of Object.values(cloud)) for (const d of Object.values(mode.drills || {})) delete d.lower;
+    const merged = recompute(mergeModes(progress.modes, cloud, catalog), catalog);
+    const changedLocal = JSON.stringify(merged) !== before;
+    if (changedLocal) {
+      progress.modes = merged;
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(`${file}.tmp`, JSON.stringify(progress, null, 2));
+      fs.renameSync(`${file}.tmp`, file);
+    }
+    // Recomputing can lift mastery above either side (one device had the medals, the other the duel wins).
+    if (Math.abs(total(merged) - (first.data.totalMastery || 0)) > 0.05) {
+      await this.request('POST', '/stats', { body: { stats: { modes: forUpload(merged, catalog) } } });
+    }
+    if (changedLocal) this.onSynced?.(progress);
+    return { ok: true, changedLocal, totalMastery: total(merged) };
+  }
+
+  /** Kept for callers that only care that the account is up to date. */
+  uploadStats() {
+    return this.sync();
   }
 }
 

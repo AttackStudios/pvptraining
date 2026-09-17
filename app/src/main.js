@@ -20,6 +20,11 @@ const social = new Social({
   saveSettings: (patch) => writeSettings({ ...readSettings(), ...patch }),
   getBridge: () => bridge,
 });
+// Progress arrived from the account (another device): show it, and let a running game take it in.
+social.onSynced = (progress) => {
+  send('social:synced', progress);
+  if (bridge) bridge.send({ t: 'reloadProgress' });
+};
 
 function settingsPath() {
   return path.join(app.getPath('userData'), 'settings.json');
@@ -159,7 +164,7 @@ function wireIpc() {
   ipcMain.handle('social:signIn', (_e, name) => social.signIn(name));
   ipcMain.handle('social:signOut', () => social.signOut());
   ipcMain.handle('social:api', (_e, method, route, payload) => social.api(method, route, payload));
-  ipcMain.handle('social:upload', () => social.uploadStats());
+  ipcMain.handle('social:upload', () => social.sync());
   ipcMain.handle('update:get', () => lastUpdate);
   ipcMain.handle('update:apply', () => updater.apply(true));
   ipcMain.handle('installer:reveal', () => {
@@ -213,7 +218,8 @@ app.whenReady().then(() => {
   createWindow();
   if (SHOTS) require('./shots').run(win);
   else {
-    social.uploadStats(); // progress made while the app was closed
+    social.sync(); // progress made while the app was closed, here or on another device
+    setInterval(() => social.sync(), 4 * 60 * 1000).unref?.();
     updater.run({
       send: (status) => {
         lastUpdate = status;

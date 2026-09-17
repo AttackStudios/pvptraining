@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('pvpt', {
     signOut: call('social:signOut'),
     api: call('social:api'),
     upload: call('social:upload'),
+    onSynced: (fn) => ipcRenderer.on('social:synced', (_e, progress) => fn(progress)),
   },
   update: {
     get: call('update:get'),

@@ -876,6 +876,18 @@ async function boot() {
   socialUi = createSocialUi({ api, state, $, $$, esc, toast, icon, hydrateIcons, play, modeOf, fmtScore, medalDots, goPage });
   api.bridge.onMessage(onMessage);
   api.bridge.onStatus(onStatus);
+  // Progress merged in from the player's account (another device).
+  api.social.onSynced((progress) => {
+    const before = Object.values(state.progress?.modes || {}).reduce((n, m) => n + (m.mastery || 0), 0);
+    state.progress = progress;
+    const after = Object.values(progress.modes || {}).reduce((n, m) => n + (m.mastery || 0), 0);
+    if (after > before + 0.05) {
+      play('success');
+      toast(`Progress synced from your account: ${Math.round(after)} total mastery on this device now.`, 'good', true);
+    }
+    // only the pages that show progress; never redraw Friends while someone is typing a message
+    if ($('#content') && !state.modeId && !state.game.session && ['train', 'tree', 'progress'].includes(state.page)) renderPage();
+  });
   window.__pvpt = { state, showWelcome, showPicker, showGuide, showShell, goPage, renderPage, setConn, onMessage };
   if (state.info.shots) return;
   if (state.settings.onboarded) showShell();

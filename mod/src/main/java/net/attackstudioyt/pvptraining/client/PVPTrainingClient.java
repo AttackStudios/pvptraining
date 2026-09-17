@@ -96,6 +96,15 @@ public class PVPTrainingClient implements ClientModInitializer {
 				});
 			}
 			case "stop" -> onServer(client, (server, player) -> SessionManager.stop());
+			// The app synced progress from the player's account (another device): take it in now,
+			// so a branch unlocked on the PC is playable on the laptop without restarting the game.
+			case "reloadProgress" -> {
+				Progress.get().mergeFromDisk();
+				JsonObject progress = new JsonObject();
+				progress.addProperty("t", "progress");
+				progress.add("progress", Progress.get().toJson());
+				bridge.broadcast(progress);
+			}
 			// Proves to the PVPTraining friends service that this really is the account it says it is,
 			// the same way joining a multiplayer server does: we tell Mojang "I am joining <nonce>",
 			// and the service asks Mojang whether that happened. The access token goes to Mojang only;

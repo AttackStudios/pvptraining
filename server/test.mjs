@@ -65,6 +65,33 @@ check('duplicate challenge refused', (await call('POST', '/challenges', { token:
 await call('POST', '/stats', { token: b.token, body: stats(45, 300) });
 check('leader flips when the other player improves', (await call('GET', '/me', { token: a.token })).data.challenges[0].leader === b.me.id);
 
+// --- progress sync across devices: merge, never overwrite ---
+const pc = { stats: { modes: { mace: { mastery: 86, unlocked: true, drills: { mace_smash: { best: 252, medal: 3, runs: 9 } }, duels: { elite: { matchWins: 1, matchLosses: 4 } } }, spear: { mastery: 12, unlocked: true, drills: {} }, elytra_mace: { mastery: 20, drills: { ely_climb: { best: 5.2, medal: 2, runs: 4, lower: true } } } } } };
+const laptop = { stats: { modes: { mace: { mastery: 11.1, unlocked: true, drills: { mace_smash: { best: 173.4, medal: 1, runs: 1 } } }, crystal: { mastery: 0, drills: { crystal_speed: { best: 0, medal: 0, runs: 1 } }, duels: { veteran: { matchWins: 0, matchLosses: 1 } } }, elytra_mace: { mastery: 0, drills: { ely_climb: { best: 8.8, medal: 1, runs: 1, lower: true } } } } } };
+const dev = await signIn(`Sync_${suffix}`);
+await call('POST', '/stats', { token: dev.token, body: pc });
+const afterLaptop = await call('POST', '/stats', { token: dev.token, body: laptop });
+const merged = afterLaptop.data.stats.modes;
+check('a weaker device cannot lower mastery', merged.mace.mastery === 86 && afterLaptop.data.totalMastery >= 118, `total ${afterLaptop.data.totalMastery}`);
+check('drill best, medal and runs keep the better side', merged.mace.drills.mace_smash.best === 252 && merged.mace.drills.mace_smash.medal === 3 && merged.mace.drills.mace_smash.runs === 9);
+check('lower-is-better keeps the faster time', merged.elytra_mace.drills.ely_climb.best === 5.2);
+check('each side contributes what only it has', merged.crystal.duels.veteran.matchLosses === 1 && merged.mace.duels.elite.matchWins === 1 && merged.spear.unlocked === true);
+const reverse = await signIn(`SyncRev_${suffix}`);
+await call('POST', '/stats', { token: reverse.token, body: laptop });
+const afterPc = await call('POST', '/stats', { token: reverse.token, body: pc });
+const canon = (v) => (v && typeof v === 'object' ? Object.keys(v).sort().map((k) => `${k}:${canon(v[k])}`).join(',') : String(v));
+check('order does not matter (laptop first, then PC)', canon(afterPc.data.stats) === canon(afterLaptop.data.stats));
+check('GET /stats returns the merged copy', (await call('GET', '/stats', { token: dev.token })).data.stats.modes.mace.mastery === 86);
+
+// --- one account on two devices ---
+const secondDevice = await signIn(a.me.name);
+check('same account, second device: same identity and friend code', secondDevice.me.id === a.me.id && secondDevice.me.code === a.me.code && secondDevice.token !== a.token);
+const fromFirst = await call('GET', '/me', { token: a.token });
+const fromSecond = await call('GET', '/me', { token: secondDevice.token });
+check('the first device stays signed in', fromFirst.status === 200);
+check('both devices see the same friends and challenges', fromSecond.status === 200 && canon(fromFirst.data.friends.map((f) => f.id)) === canon(fromSecond.data.friends.map((f) => f.id)) && fromSecond.data.friends.length >= 2 && fromSecond.data.challenges.length === fromFirst.data.challenges.length);
+check('messages are readable from the second device', (await call('GET', `/messages?id=${b.me.id}`, { token: secondDevice.token })).data.messages.length >= 2);
+
 check('remove + block', (await call('POST', '/friends/remove', { token: b.token, body: { id: a.me.id, block: true } })).data.ok);
 check('blocked player cannot find them again', (await call('POST', '/friends/request', { token: a.token, body: { query: b.me.code } })).status === 404);
 check('messages stop after removal', (await call('POST', '/messages', { token: a.token, body: { id: b.me.id, text: 'hello?' } })).status === 403);
