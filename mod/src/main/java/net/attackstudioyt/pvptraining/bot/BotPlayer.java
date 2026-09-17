@@ -40,6 +40,7 @@ public class BotPlayer extends ServerPlayerEntity {
 
 	private final MinecraftServer srv;
 	private boolean removedByUs;
+	private Vec3d knockback;
 
 	private BotPlayer(MinecraftServer server, ServerWorld world, GameProfile profile) {
 		super(server, world, profile, SyncedClientOptions.createDefault());
@@ -88,6 +89,10 @@ public class BotPlayer extends ServerPlayerEntity {
 		if (srv.getTicks() % 10 == 0) {
 			networkHandler.syncWithPlayerPosition();
 			getEntityWorld().getChunkManager().updatePosition(this);
+		}
+		if (knockback != null) {
+			setVelocity(knockback);
+			knockback = null;
 		}
 		if (brain != null) brain.tick();
 		setSneaking(inSneak);
@@ -187,6 +192,21 @@ public class BotPlayer extends ServerPlayerEntity {
 			return true;
 		}
 		return false;
+	}
+
+	/* --------------------------------------------------------------- knockback */
+
+	/**
+	 * When a player hits another player, vanilla ships the knockback to the victim's client and
+	 * then puts the victim's server-side velocity back, because a real client moves itself. A bot
+	 * has no client, so every hit would be swallowed. Remember the knockback here and re-apply it
+	 * at the start of the next tick, after that rollback. Deliberately not a mixin: other bot mods
+	 * (HeroBot, Carpet) already redirect that spot in PlayerEntity and two redirects cannot coexist.
+	 */
+	@Override
+	public void takeKnockback(double strength, double x, double z) {
+		super.takeKnockback(strength, x, z);
+		knockback = getVelocity();
 	}
 
 	/* ------------------------------------------------------------------- death */

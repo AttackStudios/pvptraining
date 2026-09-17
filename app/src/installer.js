@@ -40,13 +40,30 @@ function modrinthProfiles() {
   return out;
 }
 
+/** Dawn keeps a full game folder per profile: <data>/.dawn/profiles/<profile>/.minecraft/mods */
+function dawnProfiles() {
+  const roots = [appData('.dawn', 'profiles'), path.join(home, '.dawn', 'profiles')];
+  const out = [];
+  const seen = new Set();
+  for (const root of roots) {
+    if (!dirExists(root) || seen.has(root)) continue;
+    seen.add(root);
+    for (const name of fs.readdirSync(root)) {
+      const game = path.join(root, name, '.minecraft');
+      if (!dirExists(game)) continue;
+      out.push({ label: name, dir: path.join(game, 'mods'), hint: 'Dawn profile' });
+    }
+  }
+  return out;
+}
+
 /**
- * Folders we can safely install into without guessing. Lunar and Dawn keep
- * their mods somewhere only the launcher knows, so those guides use
- * drag-and-drop from the app instead.
+ * Folders we can safely install into without guessing. Lunar keeps its mods somewhere
+ * only the launcher knows, so that guide uses drag-and-drop from the app instead.
  */
 function targets(launcher) {
   if (launcher === 'modrinth') return modrinthProfiles();
+  if (launcher === 'dawn') return dawnProfiles();
   if (launcher === 'other') {
     const dir = vanillaDir();
     return dirExists(dir) ? [{ label: 'Minecraft Launcher', dir: path.join(dir, 'mods'), hint: 'Default .minecraft folder' }] : [];

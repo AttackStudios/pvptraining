@@ -96,6 +96,22 @@ public class PVPTrainingClient implements ClientModInitializer {
 				});
 			}
 			case "stop" -> onServer(client, (server, player) -> SessionManager.stop());
+			// Test hook (-Dpvptraining.debug=true only): the trainee punches the nearest bot so an
+			// automated run can check that bots really get knocked back.
+			case "debugHit" -> {
+				if (PVPTraining.DEBUG) onServer(client, (server, player) -> {
+					for (ServerPlayerEntity other : server.getPlayerManager().getPlayerList()) {
+						if (!(other instanceof net.attackstudioyt.pvptraining.bot.BotPlayer bot)) continue;
+						player.teleport((net.minecraft.server.world.ServerWorld) bot.getEntityWorld(), bot.getX() - 2, bot.getY(), bot.getZ(), java.util.Set.of(), -90, 0, true);
+						net.minecraft.util.math.Vec3d before = bot.getEntityPos();
+						player.setSprinting(true);
+						player.attack(bot);
+						java.util.concurrent.CompletableFuture.delayedExecutor(500, java.util.concurrent.TimeUnit.MILLISECONDS).execute(() -> server.execute(() ->
+							PVPTraining.LOG.info("[debugHit] {} moved {} blocks after the hit", bot.getName().getString(), String.format("%.2f", bot.getEntityPos().distanceTo(before)))));
+						return;
+					}
+				});
+			}
 			default -> { }
 		}
 	}

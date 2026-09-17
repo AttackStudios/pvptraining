@@ -1,8 +1,8 @@
 {
-	"required": true,
+	"required": false,
 	"minVersion": "0.8",
 	"package": "net.attackstudioyt.pvptraining.mixin",
 	"compatibilityLevel": "JAVA_21",
-	"mixins": ["PiercingStabMixin", "PlayerKnockbackMixin"],
-	"injectors": { "defaultRequire": 1 }
+	"mixins": ["PiercingStabMixin"],
+	"injectors": { "defaultRequire": 0 }
 }

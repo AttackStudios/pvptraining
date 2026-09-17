@@ -39,6 +39,8 @@ dependencies {
 // classpath): the closest thing to a launcher without leaving Gradle. ./gradlew prodClient
 tasks.register("prodClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
 	mods.from(tasks.remapJar)
+	// Compatibility runs: ./gradlew prodClient -PextraMods=/path/a.jar,/path/b.jar
+	if (project.hasProperty("extraMods")) mods.from(files(project.property("extraMods").split(",")))
 	jvmArgs.add("-Dpvptraining.debug=true")
 }
 

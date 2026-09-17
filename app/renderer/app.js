@@ -210,7 +210,7 @@ function targetsHtml(targets, launcher) {
       </div>`
     )
     .join('');
-  const none = launcher === 'modrinth' ? 'No Modrinth instances found yet. Create one, then reopen this guide.' : 'We could not find a default Minecraft folder.';
+  const none = launcher === 'modrinth' ? 'No Modrinth instances found yet. Create one, then reopen this guide.' : launcher === 'dawn' ? 'No Dawn profiles found yet. Create one, then reopen this guide.' : 'We could not find a default Minecraft folder.';
   return `<div class="targets">${rows || `<div class="target"><span><small>${none}</small></span></div>`}
     <div class="target"><span><b>Somewhere else</b><small>Pick a mods folder yourself</small></span><button class="btn small" data-pick-folder>Choose folder</button></div>
   </div>`;
