@@ -58,11 +58,17 @@ async function download(asset, dest, onProgress) {
   const out = fs.createWriteStream(tmp);
   const hash = crypto.createHash('sha256');
   let done = 0;
+  let lastPercent = -1;
   for await (const chunk of res.body) {
     hash.update(chunk);
     done += chunk.length;
     if (!out.write(chunk)) await new Promise((r) => out.once('drain', r));
-    onProgress?.(asset.size ? Math.round((done / asset.size) * 100) : 0);
+    // Report whole percents only: chunks arrive far faster than the UI needs to hear about.
+    const percent = asset.size ? Math.floor((done / asset.size) * 100) : 0;
+    if (percent !== lastPercent) {
+      lastPercent = percent;
+      onProgress?.(percent);
+    }
   }
   await new Promise((resolve, reject) => out.end((err) => (err ? reject(err) : resolve())));
   const digest = `sha256:${hash.digest('hex')}`;
