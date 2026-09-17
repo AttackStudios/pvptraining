@@ -3,6 +3,7 @@ package net.attackstudioyt.pvptraining;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import java.util.Set;
 import net.attackstudioyt.pvptraining.bot.BotPlayer;
+import net.attackstudioyt.pvptraining.session.DrillSession;
 import net.attackstudioyt.pvptraining.session.Session;
 import net.attackstudioyt.pvptraining.session.SessionManager;
 import net.attackstudioyt.pvptraining.world.Arena;
@@ -75,7 +76,12 @@ public class PVPTraining implements ModInitializer {
 				LOG.info("[dmg] {} took {} ({} raw) from {} by {}{}", entity.getName().getString(), taken, base, source.getName(),
 					source.getAttacker() == null ? "-" : source.getAttacker().getName().getString(), blocked ? " [blocked]" : "");
 			}
-			if (s != null && source.getAttacker() == sessionPlayer(s) && entity != source.getAttacker()) s.onPlayerHit(entity, source, taken);
+			if (s == null || entity == sessionPlayer(s)) return;
+			boolean byTrainee = source.getAttacker() == sessionPlayer(s);
+			// In a drill only the trainee sets anything off, and a minecart blast does not always
+			// carry their name, so any explosion that reaches the dummy is theirs.
+			boolean drillBlast = s instanceof DrillSession && entity instanceof BotPlayer && source.isIn(DamageTypeTags.IS_EXPLOSION);
+			if (byTrainee || drillBlast) s.onPlayerHit(entity, source, taken);
 		});
 		ServerLivingEntityEvents.ALLOW_DEATH.register(PVPTraining::allowDeath);
 

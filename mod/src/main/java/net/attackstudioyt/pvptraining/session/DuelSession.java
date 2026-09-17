@@ -5,9 +5,11 @@ import net.attackstudioyt.pvptraining.Catalog;
 import net.attackstudioyt.pvptraining.Kits;
 import net.attackstudioyt.pvptraining.bot.BotBrain;
 import net.attackstudioyt.pvptraining.bot.BotPlayer;
+import net.attackstudioyt.pvptraining.bot.CartBrain;
 import net.attackstudioyt.pvptraining.bot.CrystalBrain;
 import net.attackstudioyt.pvptraining.bot.MaceBrain;
 import net.attackstudioyt.pvptraining.bot.Skill;
+import net.attackstudioyt.pvptraining.bot.SwordBrain;
 import net.attackstudioyt.pvptraining.world.ArenaBuilder;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.BossBar;
@@ -44,6 +46,9 @@ public class DuelSession extends Session {
 		Skill skill = new Skill(tier.difficulty);
 		BotBrain brain = switch (modeId) {
 			case "crystal" -> new CrystalBrain(bot, arena, skill, player);
+			case "sword" -> new SwordBrain(bot, arena, skill, player);
+			case "cart" -> new CartBrain(bot, arena, skill, player, false);
+			case "xbow" -> new CartBrain(bot, arena, skill, player, true);
 			case "spear" -> new MaceBrain(bot, arena, skill, player, MaceBrain.Variant.SPEAR);
 			case "elytra_mace" -> new MaceBrain(bot, arena, skill, player, MaceBrain.Variant.ELYTRA);
 			default -> new MaceBrain(bot, arena, skill, player, MaceBrain.Variant.MACE);

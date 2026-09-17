@@ -410,6 +410,9 @@ const KITS = {
   crystal: ['Netherite Prot IV / Blast Prot legs', 'Sword', 'Pickaxe', 'End crystals', 'Obsidian', 'Respawn anchors', 'Glowstone', 'Totems', 'Pearls', 'Golden apples', 'XP bottles'],
   spear: ['Netherite Prot IV', 'Netherite spear, Lunge III', 'Density V + Wind Burst mace', 'Breach IV mace', 'Sword + axe', 'Shield', 'Wind charges', 'Pearls', 'Golden apples', 'Totem', 'No elytra'],
   elytra_mace: ['Netherite Prot IV', 'Elytra', 'Firework rockets', 'Density V + Wind Burst mace', 'Breach IV mace', 'Sword + axe', 'Shield', 'Wind charges', 'Pearls', 'Golden apples', 'Totem'],
+  sword: ['Diamond Prot III', 'Diamond sword', 'No healing', 'No shield'],
+  cart: ['Diamond Prot IV / Blast Prot legs', 'Power V Flame bow', 'Rails', 'TNT minecarts (inventory full)', 'Sharpness V sword + axe', 'Oak logs', 'Pearls', 'Golden apples', 'Totem', 'No shield'],
+  xbow: ['Diamond Prot IV / Blast Prot legs', 'Loaded crossbow', 'Flint and steel', 'Power V Flame bow', 'Rails', 'TNT minecarts', 'Sharpness V sword', 'Oak logs', 'Pearls', 'Golden apples', 'Totem'],
 };
 
 function pageMode(el) {
@@ -549,18 +552,33 @@ function updateLive() {
 /* -------------------------------------------------------------- tree page */
 
 function pageTree(el) {
-  const nodes = [
-    { id: 'mace', x: 30, y: 26 },
-    { id: 'spear', x: 14, y: 72 },
-    { id: 'elytra_mace', x: 46, y: 72 },
-    { id: 'crystal', x: 78, y: 26 },
-    { soon: true, x: 78, y: 72, label: 'Crystal branches', sub: 'Coming later' },
-  ];
-  const links = [
-    { from: 'mace', to: 'spear', a: nodes[0], b: nodes[1] },
-    { from: 'mace', to: 'elytra_mace', a: nodes[0], b: nodes[2] },
-    { soon: true, a: nodes[3], b: nodes[4] },
-  ];
+  // Laid out from the catalog: every gamemode gets a column as wide as its branch count, its
+  // branches sit underneath it, and a gamemode with none shows a "coming later" placeholder.
+  const roots = state.catalog.modes.filter((m) => m.kind === 'gamemode');
+  const kids = (id) => state.catalog.modes.filter((m) => m.parent === id);
+  const slots = roots.reduce((n, r) => n + Math.max(1, kids(r.id).length), 0);
+  const unit = 100 / slots;
+  const nodes = [];
+  const links = [];
+  let cursor = 0;
+  for (const root of roots) {
+    const children = kids(root.id);
+    const span = Math.max(1, children.length);
+    const top = { id: root.id, x: (cursor + span / 2) * unit, y: 26 };
+    nodes.push(top);
+    if (children.length) {
+      children.forEach((c, i) => {
+        const node = { id: c.id, x: (cursor + i + 0.5) * unit, y: 72 };
+        nodes.push(node);
+        links.push({ to: c.id, a: top, b: node });
+      });
+    } else {
+      const node = { soon: true, x: top.x, y: 72, label: `${root.name} branches`, sub: 'Coming later' };
+      nodes.push(node);
+      links.push({ soon: true, a: top, b: node });
+    }
+    cursor += span;
+  }
   const R = 2 * Math.PI * 52;
   const nodeHtml = (n) => {
     if (n.soon) return `<div class="node soon" style="left:${n.x}%;top:${n.y}%"><div class="bubble"><span class="g" style="width:34px;height:34px">${icon('soon')}</span></div><b>${n.label}</b><span>${n.sub}</span></div>`;

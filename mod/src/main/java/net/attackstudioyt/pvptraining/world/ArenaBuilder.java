@@ -21,7 +21,7 @@ import net.minecraft.util.math.Box;
  * the layout version changes), so the world is ready-made by the time you spawn.
  */
 public final class ArenaBuilder {
-	private static final int LAYOUT_VERSION = 2;
+	private static final int LAYOUT_VERSION = 3;
 	/** How deep the crystal pit's breakable ground goes before bedrock. */
 	private static final int PIT_DEPTH = 11;
 	private static final int FLAGS = Block.NOTIFY_LISTENERS | Block.FORCE_STATE;
@@ -42,6 +42,8 @@ public final class ArenaBuilder {
 		buildRound(world, Arena.SPEAR, Blocks.CYAN_CONCRETE.getDefaultState(), 40, false);
 		buildRound(world, Arena.ELYTRA, Blocks.LIGHT_BLUE_CONCRETE.getDefaultState(), 110, true);
 		buildCrystalPit(world, Arena.CRYSTAL);
+		buildCrystalPit(world, Arena.CART);
+		buildRound(world, Arena.SWORD, Blocks.RED_CONCRETE.getDefaultState(), 30, false);
 		buildTakeoffPad(world, Arena.ELYTRA);
 		try {
 			Files.writeString(marker, String.valueOf(LAYOUT_VERSION));
@@ -127,7 +129,7 @@ public final class ArenaBuilder {
 	/** Puts an arena back to its clean state between rounds: player-placed blocks, crystals, drops. */
 	public static void reset(ServerWorld world, Arena a) {
 		int r = a.radius;
-		int top = a == Arena.CRYSTAL ? 39 : 12;
+		int top = a.square ? 39 : 12;
 		BlockState air = Blocks.AIR.getDefaultState();
 		for (int dx = -r; dx <= r; dx++) {
 			for (int dz = -r; dz <= r; dz++) {
@@ -136,7 +138,7 @@ public final class ArenaBuilder {
 					BlockPos pos = new BlockPos(a.x + dx, a.y + h, a.z + dz);
 					if (!world.getBlockState(pos).isAir()) world.setBlockState(pos, air, FLAGS);
 				}
-				if (a == Arena.CRYSTAL) {
+				if (a.square) {
 					// fill the craters back in
 					for (int depth = 1; depth <= PIT_DEPTH; depth++) {
 						BlockPos pos = new BlockPos(a.x + dx, a.y - depth, a.z + dz);

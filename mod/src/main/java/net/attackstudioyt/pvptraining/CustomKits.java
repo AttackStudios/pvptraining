@@ -36,13 +36,16 @@ public final class CustomKits {
 			case "mace" -> "mace";
 			case "cpvp", "crystal", "cp" -> "crystal";
 			case "spear" -> "spear";
+			case "sword" -> "sword";
+			case "cart", "carts", "minecart" -> "cart";
+			case "xbow", "x-bow", "crossbow" -> "xbow";
 			case "elytra", "ely", "elytra_mace", "elytramace", "elymace" -> "elytra_mace";
 			default -> null;
 		};
 	}
 
 	public static List<String> modeWords() {
-		return List.of("mace", "cpvp", "spear", "elytra");
+		return List.of("mace", "cpvp", "sword", "cart", "spear", "elytra", "xbow");
 	}
 
 	private static Path file() {

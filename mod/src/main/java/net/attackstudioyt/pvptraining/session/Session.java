@@ -52,6 +52,8 @@ public abstract class Session {
 	public static Arena arenaFor(String modeId) {
 		return switch (modeId) {
 			case "crystal" -> Arena.CRYSTAL;
+			case "sword" -> Arena.SWORD;
+			case "cart", "xbow" -> Arena.CART;
 			case "spear" -> Arena.SPEAR;
 			case "elytra_mace" -> Arena.ELYTRA;
 			default -> Arena.MACE;

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import java.util.List;
 import net.attackstudioyt.pvptraining.Catalog;
 import net.attackstudioyt.pvptraining.Live;
+import net.attackstudioyt.pvptraining.PVPTraining;
 import net.attackstudioyt.pvptraining.Progress;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
@@ -27,7 +28,8 @@ public final class SessionManager {
 		Catalog catalog = Catalog.get();
 		Catalog.Mode mode = catalog.mode(modeId);
 		if (mode == null) return "Unknown gamemode: " + modeId;
-		if (!Progress.get().isUnlocked(modeId)) return mode.name + " is still locked. Master " + catalog.mode(mode.parent).name + " first.";
+		// Debug runs (-Dpvptraining.debug=true) may start locked branches so they can be tested.
+		if (!PVPTraining.DEBUG && !Progress.get().isUnlocked(modeId)) return mode.name + " is still locked. Master " + catalog.mode(mode.parent).name + " first.";
 		stop();
 		if ("duel".equals(activity)) {
 			Catalog.Tier tier = catalog.tier(id);

@@ -3,6 +3,7 @@ package net.attackstudioyt.pvptraining;
 import java.util.List;
 import net.attackstudioyt.pvptraining.bot.BotPlayer;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.ChargedProjectilesComponent;
 import net.minecraft.component.type.FireworksComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.Enchantments;
@@ -47,6 +48,9 @@ public final class Kits {
 		if (!custom) {
 			switch (mode) {
 				case "crystal" -> crystal(player);
+				case "sword" -> sword(player);
+				case "cart" -> cart(player, false);
+				case "xbow" -> cart(player, true);
 				case "spear" -> mace(player, true, false);
 				case "elytra_mace" -> mace(player, false, true);
 				default -> mace(player, false, false);
@@ -104,6 +108,61 @@ public final class Kits {
 		inv.setStack(slot++, new ItemStack(Items.EXPERIENCE_BOTTLE, 64));
 		inv.setStack(slot, new ItemStack(Items.ENDER_PEARL, 16));
 		p.addStatusEffect(new StatusEffectInstance(StatusEffects.SATURATION, 40, 0, true, false));
+	}
+
+	/** Sword: diamond Protection III and a diamond sword. No healing, no shield: the fundamentals only. */
+	private static void sword(ServerPlayerEntity p) {
+		p.equipStack(EquipmentSlot.HEAD, ench(p, Items.DIAMOND_HELMET, Enchantments.PROTECTION, 3));
+		p.equipStack(EquipmentSlot.CHEST, ench(p, Items.DIAMOND_CHESTPLATE, Enchantments.PROTECTION, 3));
+		p.equipStack(EquipmentSlot.LEGS, ench(p, Items.DIAMOND_LEGGINGS, Enchantments.PROTECTION, 3));
+		p.equipStack(EquipmentSlot.FEET, ench(p, Items.DIAMOND_BOOTS, Enchantments.PROTECTION, 3));
+		p.getInventory().setStack(0, tough(new ItemStack(Items.DIAMOND_SWORD)));
+	}
+
+	/**
+	 * Cart: diamond Protection IV with Blast Protection legs, a Power V Flame bow to set carts off,
+	 * rails, and as many TNT minecarts as the inventory holds (they do not stack). No shield, as on
+	 * the cart tier list. X-Bow adds what crossbow carting needs: a loaded crossbow and flint and
+	 * steel, because the bolt has to pass through fire to light up.
+	 */
+	private static void cart(ServerPlayerEntity p, boolean xbow) {
+		p.equipStack(EquipmentSlot.HEAD, ench(p, Items.DIAMOND_HELMET, Enchantments.PROTECTION, 4));
+		p.equipStack(EquipmentSlot.CHEST, ench(p, Items.DIAMOND_CHESTPLATE, Enchantments.PROTECTION, 4));
+		p.equipStack(EquipmentSlot.LEGS, ench(p, Items.DIAMOND_LEGGINGS, Enchantments.BLAST_PROTECTION, 4));
+		ItemStack boots = ench(p, Items.DIAMOND_BOOTS, Enchantments.PROTECTION, 4);
+		boots.addEnchantment(entry(p, Enchantments.FEATHER_FALLING), 4);
+		p.equipStack(EquipmentSlot.FEET, boots);
+		p.equipStack(EquipmentSlot.OFFHAND, new ItemStack(Items.TOTEM_OF_UNDYING));
+
+		ItemStack bow = ench(p, Items.BOW, Enchantments.POWER, 5);
+		bow.addEnchantment(entry(p, Enchantments.FLAME), 1);
+		var inv = p.getInventory();
+		inv.setStack(0, ench(p, Items.DIAMOND_SWORD, Enchantments.SHARPNESS, 5));
+		inv.setStack(1, new ItemStack(Items.ENDER_PEARL, 16));
+		inv.setStack(2, new ItemStack(Items.GOLDEN_APPLE, 64));
+		inv.setStack(3, new ItemStack(Items.OAK_LOG, 64));
+		inv.setStack(4, new ItemStack(Items.RAIL, 64));
+		if (xbow) {
+			inv.setStack(5, tough(new ItemStack(Items.FLINT_AND_STEEL)));
+			inv.setStack(6, loadedCrossbow());
+			inv.setStack(7, bow);
+			inv.setStack(8, new ItemStack(Items.TNT_MINECART));
+		} else {
+			inv.setStack(5, bow);
+			inv.setStack(6, new ItemStack(Items.TNT_MINECART));
+			inv.setStack(7, new ItemStack(Items.TNT_MINECART));
+			inv.setStack(8, ench(p, Items.DIAMOND_AXE, Enchantments.SHARPNESS, 5));
+		}
+		inv.setStack(9, new ItemStack(Items.ARROW, 64));
+		inv.setStack(10, new ItemStack(Items.RAIL, 64));
+		inv.setStack(11, new ItemStack(Items.ENDER_PEARL, 16));
+		for (int slot = 12; slot < 36; slot++) inv.setStack(slot, new ItemStack(Items.TNT_MINECART));
+	}
+
+	private static ItemStack loadedCrossbow() {
+		ItemStack crossbow = tough(new ItemStack(Items.CROSSBOW));
+		crossbow.set(DataComponentTypes.CHARGED_PROJECTILES, ChargedProjectilesComponent.of(new ItemStack(Items.ARROW)));
+		return crossbow;
 	}
 
 	private static void armor(ServerPlayerEntity p, boolean blastLegs) {

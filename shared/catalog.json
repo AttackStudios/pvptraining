@@ -3,52 +3,377 @@
   "minecraft": "1.21.11",
   "loader": "fabric",
   "tiers": [
-    { "id": "rookie",  "name": "Rookie",  "difficulty": 2,  "blurb": "Slow reactions, sloppy aim. Learn the rhythm." },
-    { "id": "fighter", "name": "Fighter", "difficulty": 4,  "blurb": "Punishes obvious mistakes." },
-    { "id": "veteran", "name": "Veteran", "difficulty": 6,  "blurb": "Plays the kit properly and heals on time." },
-    { "id": "elite",   "name": "Elite",   "difficulty": 8,  "blurb": "Tight timing, few openings." },
-    { "id": "ace",     "name": "Ace",     "difficulty": 10, "blurb": "Near frame-perfect. Beat this and you are one." }
+    {
+      "id": "rookie",
+      "name": "Rookie",
+      "difficulty": 2,
+      "blurb": "Slow reactions, sloppy aim. Learn the rhythm."
+    },
+    {
+      "id": "fighter",
+      "name": "Fighter",
+      "difficulty": 4,
+      "blurb": "Punishes obvious mistakes."
+    },
+    {
+      "id": "veteran",
+      "name": "Veteran",
+      "difficulty": 6,
+      "blurb": "Plays the kit properly and heals on time."
+    },
+    {
+      "id": "elite",
+      "name": "Elite",
+      "difficulty": 8,
+      "blurb": "Tight timing, few openings."
+    },
+    {
+      "id": "ace",
+      "name": "Ace",
+      "difficulty": 10,
+      "blurb": "Near frame-perfect. Beat this and you are one."
+    }
   ],
-  "mastery": { "unlockAt": 80, "drillWeight": 50, "duelWeight": 50, "requiredTier": "elite" },
+  "mastery": {
+    "unlockAt": 80,
+    "drillWeight": 50,
+    "duelWeight": 50,
+    "requiredTier": "elite"
+  },
   "modes": [
     {
-      "id": "mace", "name": "Mace", "kind": "gamemode", "color": "#ffb23e", "parent": null,
+      "id": "mace",
+      "name": "Mace",
+      "kind": "gamemode",
+      "color": "#ffb23e",
+      "parent": null,
       "tagline": "Wind charge up. Come down like a meteor.",
       "summary": "The base MacePvP kit: mace, wind charges, elytra with no rockets. Learn to launch, line up the fall and land the smash.",
       "drills": [
-        { "id": "mace_smash", "name": "Launch & Smash", "goal": "Wind-charge up and smash the stationary dummy. Score is your total smash damage over 10 attempts.", "unit": "dmg", "medals": [90, 160, 240], "seconds": 0, "attempts": 10 },
-        { "id": "mace_chase", "name": "Moving Target", "goal": "The dummy strafes and jumps. Land as many smashes as you can in 60 seconds.", "unit": "smashes", "medals": [3, 6, 9], "seconds": 60 },
-        { "id": "mace_chain", "name": "Smash Chain", "goal": "Chain smashes back to back: every smash within 4 s of the last one extends the chain. Best chain in 90 seconds.", "unit": "chain", "medals": [2, 4, 6], "seconds": 90 }
+        {
+          "id": "mace_smash",
+          "name": "Launch & Smash",
+          "goal": "Wind-charge up and smash the stationary dummy. Score is your total smash damage over 10 attempts.",
+          "unit": "dmg",
+          "medals": [
+            90,
+            160,
+            240
+          ],
+          "seconds": 0,
+          "attempts": 10
+        },
+        {
+          "id": "mace_chase",
+          "name": "Moving Target",
+          "goal": "The dummy strafes and jumps. Land as many smashes as you can in 60 seconds.",
+          "unit": "smashes",
+          "medals": [
+            3,
+            6,
+            9
+          ],
+          "seconds": 60
+        },
+        {
+          "id": "mace_chain",
+          "name": "Smash Chain",
+          "goal": "Chain smashes back to back: every smash within 4 s of the last one extends the chain. Best chain in 90 seconds.",
+          "unit": "chain",
+          "medals": [
+            2,
+            4,
+            6
+          ],
+          "seconds": 90
+        }
       ]
     },
     {
-      "id": "crystal", "name": "Crystal", "kind": "gamemode", "color": "#e86bff", "parent": null,
+      "id": "crystal",
+      "name": "Crystal",
+      "kind": "gamemode",
+      "color": "#e86bff",
+      "parent": null,
       "tagline": "Obsidian, crystal, hit. Faster.",
       "summary": "Standard Crystal PvP kit: netherite, totems, obsidian, end crystals, anchors. Train placement speed, totem discipline and survival.",
       "drills": [
-        { "id": "crystal_speed", "name": "Place & Pop", "goal": "Place and detonate crystals next to the armored dummy. Score is crystals detonated in 30 seconds.", "unit": "crystals", "medals": [15, 30, 45], "seconds": 30 },
-        { "id": "crystal_pops", "name": "Totem Breaker", "goal": "The dummy re-totems instantly. Pop as many totems as you can in 45 seconds.", "unit": "pops", "medals": [4, 8, 12], "seconds": 45 },
-        { "id": "crystal_survive", "name": "Under Fire", "goal": "The bot crystals you non-stop. Re-totem and stay alive. Score is seconds survived (max 90).", "unit": "sec", "medals": [25, 50, 90], "seconds": 90 }
+        {
+          "id": "crystal_speed",
+          "name": "Place & Pop",
+          "goal": "Place and detonate crystals next to the armored dummy. Score is crystals detonated in 30 seconds.",
+          "unit": "crystals",
+          "medals": [
+            15,
+            30,
+            45
+          ],
+          "seconds": 30
+        },
+        {
+          "id": "crystal_pops",
+          "name": "Totem Breaker",
+          "goal": "The dummy re-totems instantly. Pop as many totems as you can in 45 seconds.",
+          "unit": "pops",
+          "medals": [
+            4,
+            8,
+            12
+          ],
+          "seconds": 45
+        },
+        {
+          "id": "crystal_survive",
+          "name": "Under Fire",
+          "goal": "The bot crystals you non-stop. Re-totem and stay alive. Score is seconds survived (max 90).",
+          "unit": "sec",
+          "medals": [
+            25,
+            50,
+            90
+          ],
+          "seconds": 90
+        }
       ]
     },
     {
-      "id": "spear", "name": "Spear", "kind": "branch", "color": "#35e0c2", "parent": "mace",
+      "id": "sword",
+      "name": "Sword",
+      "kind": "gamemode",
+      "color": "#ff5d6c",
+      "parent": null,
+      "tagline": "Combos, W-taps, S-taps, crits. The fundamentals.",
+      "summary": "Sword and armour, nothing to hide behind. Learn to reset your sprint for knockback, step out of their reach, land crits and keep a combo going.",
+      "drills": [
+        {
+          "id": "sword_combo",
+          "name": "Combo Counter",
+          "goal": "Hit the dodging dummy again and again with no gap longer than one sword cooldown. Score is your longest combo in 60 seconds. Only charged hits count.",
+          "unit": "hits",
+          "medals": [
+            4,
+            7,
+            11
+          ],
+          "seconds": 60
+        },
+        {
+          "id": "sword_wtap",
+          "name": "W-Tap",
+          "goal": "Let go of W for a moment after every hit so the next one is a fresh sprint hit with full knockback. Score is sprint hits landed in 45 seconds.",
+          "unit": "sprint hits",
+          "medals": [
+            12,
+            20,
+            28
+          ],
+          "seconds": 45
+        },
+        {
+          "id": "sword_crit",
+          "name": "Crit Chain",
+          "goal": "Jump and swing on the way down. A crit needs you falling and not sprinting. Score is critical hits in 45 seconds.",
+          "unit": "crits",
+          "medals": [
+            8,
+            15,
+            22
+          ],
+          "seconds": 45
+        }
+      ]
+    },
+    {
+      "id": "cart",
+      "name": "Cart",
+      "kind": "gamemode",
+      "color": "#ff8a3d",
+      "parent": null,
+      "tagline": "Rail. Cart. Flame arrow. Boom.",
+      "summary": "TNT minecart PvP. A burning arrow sets a TNT minecart off instantly, and the faster the arrow the bigger the blast. Learn to get the rail and cart down beside them and the shot off before they move.",
+      "drills": [
+        {
+          "id": "cart_speed",
+          "name": "Rail, Cart, Boom",
+          "goal": "Place a rail beside the dummy, a TNT minecart on it, and hit the cart with a Flame arrow. Score is blasts that reach the dummy in 45 seconds.",
+          "unit": "carts",
+          "medals": [
+            4,
+            8,
+            12
+          ],
+          "seconds": 45
+        },
+        {
+          "id": "cart_damage",
+          "name": "Big Blast",
+          "goal": "Blast power grows with arrow speed, so a full draw hits far harder than a tap. Total blast damage on the dummy over 8 carts.",
+          "unit": "dmg",
+          "medals": [
+            350,
+            520,
+            680
+          ],
+          "seconds": 0,
+          "attempts": 8
+        },
+        {
+          "id": "cart_moving",
+          "name": "Moving Target",
+          "goal": "The dummy runs and jumps. Put the cart where it is going, not where it was. Blasts landed in 60 seconds.",
+          "unit": "carts",
+          "medals": [
+            3,
+            6,
+            10
+          ],
+          "seconds": 60
+        }
+      ]
+    },
+    {
+      "id": "spear",
+      "name": "Spear",
+      "kind": "branch",
+      "color": "#35e0c2",
+      "parent": "mace",
       "tagline": "Attribute-swap lunges with almost no cooldown.",
       "summary": "Mace kit without the elytra, plus a Lunge III spear. Drill the swap until the lunge cooldown stops mattering.",
       "drills": [
-        { "id": "spear_lunge", "name": "Lunge Lines", "goal": "Lunge through the glowing rings in order. Score is rings cleared in 45 seconds.", "unit": "rings", "medals": [6, 11, 16], "seconds": 45 },
-        { "id": "spear_swap", "name": "Attribute Swap", "goal": "Lunge, swap, lunge. Score is lunges performed in 30 seconds: only fast swapping gets you past silver.", "unit": "lunges", "medals": [8, 14, 22], "seconds": 30 },
-        { "id": "spear_smash", "name": "Lunge Into Smash", "goal": "Use a lunge to close distance, wind-charge up and finish with a mace smash. Smashes landed in 75 seconds.", "unit": "smashes", "medals": [3, 5, 8], "seconds": 75 }
+        {
+          "id": "spear_lunge",
+          "name": "Lunge Lines",
+          "goal": "Lunge through the glowing rings in order. Score is rings cleared in 45 seconds.",
+          "unit": "rings",
+          "medals": [
+            6,
+            11,
+            16
+          ],
+          "seconds": 45
+        },
+        {
+          "id": "spear_swap",
+          "name": "Attribute Swap",
+          "goal": "Lunge, swap, lunge. Score is lunges performed in 30 seconds: only fast swapping gets you past silver.",
+          "unit": "lunges",
+          "medals": [
+            8,
+            14,
+            22
+          ],
+          "seconds": 30
+        },
+        {
+          "id": "spear_smash",
+          "name": "Lunge Into Smash",
+          "goal": "Use a lunge to close distance, wind-charge up and finish with a mace smash. Smashes landed in 75 seconds.",
+          "unit": "smashes",
+          "medals": [
+            3,
+            5,
+            8
+          ],
+          "seconds": 75
+        }
       ]
     },
     {
-      "id": "elytra_mace", "name": "Elytra + Mace", "kind": "branch", "color": "#7aa5ff", "parent": "mace",
+      "id": "elytra_mace",
+      "name": "Elytra + Mace",
+      "kind": "branch",
+      "color": "#7aa5ff",
+      "parent": "mace",
       "tagline": "Climb, turn, rocket down, wings off, smash.",
       "summary": "Mace kit plus firework rockets. Master the full dive: equip, climb, wait, look back down, rocket at the target, swap the elytra off at the last moment and mace.",
       "drills": [
-        { "id": "ely_climb", "name": "Takeoff", "goal": "From the pad: equip elytra, take off and reach 60 blocks above the arena. Score is your best time out of 5 (lower is better).", "unit": "sec", "lowerIsBetter": true, "medals": [9, 6.5, 4.5], "seconds": 0, "attempts": 5 },
-        { "id": "ely_dive", "name": "Dive Bomb", "goal": "Dive on the stationary dummy, take the elytra off before impact and smash. Total smash damage over 6 dives.", "unit": "dmg", "medals": [120, 220, 330], "seconds": 0, "attempts": 6 },
-        { "id": "ely_full", "name": "Full Sequence", "goal": "The dummy moves. Complete full climb-dive-smash cycles. Clean dives (wings off before the hit) in 120 seconds.", "unit": "dives", "medals": [2, 4, 6], "seconds": 120 }
+        {
+          "id": "ely_climb",
+          "name": "Takeoff",
+          "goal": "Equip the elytra, take off and fly up through the glowing ring 60 blocks above the pad. The clock starts when you start gliding. Score is your best time out of 5 (lower is better).",
+          "unit": "sec",
+          "lowerIsBetter": true,
+          "medals": [
+            9,
+            6.5,
+            4.5
+          ],
+          "seconds": 0,
+          "attempts": 5
+        },
+        {
+          "id": "ely_dive",
+          "name": "Dive Bomb",
+          "goal": "Dive on the stationary dummy, take the elytra off before impact and smash. Total smash damage over 6 dives.",
+          "unit": "dmg",
+          "medals": [
+            120,
+            220,
+            330
+          ],
+          "seconds": 0,
+          "attempts": 6
+        },
+        {
+          "id": "ely_full",
+          "name": "Full Sequence",
+          "goal": "The dummy moves. Complete full climb-dive-smash cycles. Clean dives (wings off before the hit) in 120 seconds.",
+          "unit": "dives",
+          "medals": [
+            2,
+            4,
+            6
+          ],
+          "seconds": 120
+        }
+      ]
+    },
+    {
+      "id": "xbow",
+      "name": "X-Bow",
+      "kind": "branch",
+      "color": "#c9a26b",
+      "parent": "cart",
+      "tagline": "Shoot through fire for the biggest carts.",
+      "summary": "Crossbow carting. Crossbows cannot have Flame, so you light a fire in front of the cart and shoot through it: the bolt catches fire on the way and hits at crossbow speed for a bigger blast than any bow.",
+      "drills": [
+        {
+          "id": "xbow_setup",
+          "name": "Through the Fire",
+          "goal": "Rail, cart, flint and steel in front of it, then fire the loaded crossbow through the flames at the cart. Crossbow blasts that reach the dummy in 60 seconds.",
+          "unit": "carts",
+          "medals": [
+            2,
+            4,
+            7
+          ],
+          "seconds": 60
+        },
+        {
+          "id": "xbow_damage",
+          "name": "Heavy Bolt",
+          "goal": "Total blast damage on the dummy over 6 crossbow carts. Reload between shots.",
+          "unit": "dmg",
+          "medals": [
+            300,
+            460,
+            620
+          ],
+          "seconds": 0,
+          "attempts": 6
+        },
+        {
+          "id": "xbow_moving",
+          "name": "Moving Target",
+          "goal": "Crossbow carts landed on the moving dummy in 90 seconds.",
+          "unit": "carts",
+          "medals": [
+            2,
+            4,
+            6
+          ],
+          "seconds": 90
+        }
       ]
     }
   ]

@@ -23,6 +23,7 @@ public class MaceBrain extends BotBrain {
 	private Dive dive = Dive.NONE;
 	private int diveTicks;
 	private int nextDiveAt;
+	private int chainHits;
 
 	private Ely ely = Ely.NONE;
 	private int elyTicks;
@@ -175,12 +176,22 @@ public class MaceBrain extends BotBrain {
 				if (bot.isOnGround() && diveTicks > 12) endDive();
 			}
 			case FALL -> {
-				selectMace();
+				// Wind Burst throws the attacker back up after a smash. Good players ride that bounce
+				// into another smash; the last hit of a chain uses the Breach mace, which does not bounce.
+				boolean lastOfChain = chainHits >= maxChain();
+				if (lastOfChain) bot.getInventory().setSelectedSlot(6);
+				else selectMace();
+				if (!bot.holding(Items.MACE)) bot.select(Items.MACE);
 				steerOver();
-				if (bot.getVelocity().y < -0.08 && inReach(3.4) && bot.fallDistance > 1.5F) {
+				if (bot.getVelocity().y < -0.08 && inReach(3.4) && bot.fallDistance > 1.5F && lateEnough()) {
 					bot.setSprinting(false);
 					bot.hit(target);
-					endDive();
+					chainHits++;
+					if (lastOfChain) endDive();
+					else {
+						dive = Dive.RISE;
+						diveTicks = 8;
+					}
 					return;
 				}
 				if (bot.isOnGround() || diveTicks > 60) endDive();
@@ -189,8 +200,14 @@ public class MaceBrain extends BotBrain {
 		}
 	}
 
+	/** Bounces a bot of this skill will chain before finishing: none for a Rookie, three for an Ace. */
+	private int maxChain() {
+		return Math.round(skill.t * 3);
+	}
+
 	private void endDive() {
 		dive = Dive.NONE;
+		chainHits = 0;
 		nextDiveAt = age + skill.diveCooldown() + random.nextInt(30);
 		bot.inJump = false;
 	}
@@ -204,6 +221,16 @@ public class MaceBrain extends BotBrain {
 			}
 		}
 		bot.select(Items.MACE);
+	}
+
+	/**
+	 * A smash is worth more the further you have fallen, and landing it cancels the fall damage.
+	 * So hold the swing until the last moment: just above the target, about to touch down.
+	 */
+	private boolean lateEnough() {
+		double above = bot.getY() - target.getY();
+		double nextTick = above + bot.getVelocity().y;
+		return above < 2.6 || nextTick < 1.2;
 	}
 
 	/** Air control: drift over the target, then stall so the fall lands on top of them. */
@@ -301,7 +328,7 @@ public class MaceBrain extends BotBrain {
 			case DROP -> {
 				selectMace();
 				steerOver();
-				if (bot.getVelocity().y < -0.08 && inReach(3.5) && bot.fallDistance > 1.5F) {
+				if (bot.getVelocity().y < -0.08 && inReach(3.5) && bot.fallDistance > 1.5F && lateEnough()) {
 					bot.hit(target);
 					abortElytra();
 					return;

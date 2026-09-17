@@ -9,7 +9,10 @@ public enum Arena {
 	MACE("Mace Arena", 300, 100, 0, 28, false),
 	SPEAR("Spear Arena", 600, 100, 0, 32, false),
 	ELYTRA("Elytra Arena", 900, 100, 0, 40, false),
-	CRYSTAL("Crystal Pit", 1200, 100, 0, 20, true);
+	CRYSTAL("Crystal Pit", 1200, 100, 0, 20, true),
+	SWORD("Sword Arena", 1500, 100, 0, 22, false),
+	/** Breakable ground like the crystal pit: minecart blasts crater it too. Shared by Cart and X-Bow. */
+	CART("Cart Pit", 1800, 100, 0, 20, true);
 
 	public final String title;
 	public final int x;
