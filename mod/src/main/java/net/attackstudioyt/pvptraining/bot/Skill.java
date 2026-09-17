@@ -34,6 +34,6 @@ public final class Skill {
 	public int crystalPlaceDelay() { return Math.round(lerp(16, 2)); }
 	public int crystalBreakDelay() { return Math.round(lerp(10, 1)); }
 	public int retotemDelay() { return Math.round(lerp(26, 2)); }
-	/** How much of its own blast damage the bot is willing to ignore. */
-	public float selfDamageWeight() { return lerp(0.25F, 0.8F); }
+	/** How heavily the bot counts its own blast damage against a crystal placement. */
+	public float selfDamageWeight() { return lerp(0.45F, 1.05F); }
 }

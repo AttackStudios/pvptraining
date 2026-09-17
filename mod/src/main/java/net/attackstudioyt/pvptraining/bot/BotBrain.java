@@ -143,6 +143,8 @@ public abstract class BotBrain {
 			bot.inStrafe = strafeDir * skill.strafeAmount();
 			bot.setSprinting(false);
 		}
+		// Blasts leave craters and ledges: hop out of them instead of walking into the wall.
+		bot.inJump = bot.horizontalCollision && bot.isOnGround();
 		stayInArena();
 	}
 

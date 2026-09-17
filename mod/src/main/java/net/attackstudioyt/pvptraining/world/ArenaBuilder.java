@@ -21,7 +21,9 @@ import net.minecraft.util.math.Box;
  * the layout version changes), so the world is ready-made by the time you spawn.
  */
 public final class ArenaBuilder {
-	private static final int LAYOUT_VERSION = 1;
+	private static final int LAYOUT_VERSION = 2;
+	/** How deep the crystal pit's breakable ground goes before bedrock. */
+	private static final int PIT_DEPTH = 11;
 	private static final int FLAGS = Block.NOTIFY_LISTENERS | Block.FORCE_STATE;
 
 	private ArenaBuilder() {}
@@ -87,6 +89,13 @@ public final class ArenaBuilder {
 		return (band & 1) == 0 ? Blocks.DEEPSLATE_TILES.getDefaultState() : Blocks.DEEPSLATE_BRICKS.getDefaultState();
 	}
 
+	/** Grass over dirt over stone, like the flat terrain crystal fights actually happen on. */
+	private static BlockState pitLayer(int depth) {
+		if (depth == 1) return Blocks.GRASS_BLOCK.getDefaultState();
+		if (depth <= 4) return Blocks.DIRT.getDefaultState();
+		return Blocks.STONE.getDefaultState();
+	}
+
 	private static void buildCrystalPit(ServerWorld world, Arena a) {
 		int r = a.radius;
 		BlockState bedrock = Blocks.BEDROCK.getDefaultState();
@@ -95,13 +104,13 @@ public final class ArenaBuilder {
 				int x = a.x + dx;
 				int z = a.z + dz;
 				boolean wall = Math.abs(dx) == r + 1 || Math.abs(dz) == r + 1;
-				set(world, x, a.y - 2, z, bedrock);
+				set(world, x, a.y - PIT_DEPTH - 1, z, bedrock);
 				if (wall) {
-					for (int h = -1; h <= 3; h++) set(world, x, a.y + h, z, bedrock);
+					for (int h = -PIT_DEPTH; h <= 3; h++) set(world, x, a.y + h, z, bedrock);
 					set(world, x, a.y + 4, z, ((dx + dz) & 3) == 0 ? Blocks.SEA_LANTERN.getDefaultState() : Blocks.CRYING_OBSIDIAN.getDefaultState());
 					for (int h = 5; h <= 40; h++) set(world, x, a.y + h, z, Blocks.BARRIER.getDefaultState());
 				} else {
-					set(world, x, a.y - 1, z, Blocks.OBSIDIAN.getDefaultState());
+					for (int depth = 1; depth <= PIT_DEPTH; depth++) set(world, x, a.y - depth, z, pitLayer(depth));
 					set(world, x, a.y + 40, z, Blocks.BARRIER.getDefaultState());
 				}
 			}
@@ -128,8 +137,12 @@ public final class ArenaBuilder {
 					if (!world.getBlockState(pos).isAir()) world.setBlockState(pos, air, FLAGS);
 				}
 				if (a == Arena.CRYSTAL) {
-					BlockPos floor = new BlockPos(a.x + dx, a.y - 1, a.z + dz);
-					if (!world.getBlockState(floor).isOf(Blocks.OBSIDIAN)) world.setBlockState(floor, Blocks.OBSIDIAN.getDefaultState(), FLAGS);
+					// fill the craters back in
+					for (int depth = 1; depth <= PIT_DEPTH; depth++) {
+						BlockPos pos = new BlockPos(a.x + dx, a.y - depth, a.z + dz);
+						BlockState want = pitLayer(depth);
+						if (world.getBlockState(pos) != want) world.setBlockState(pos, want, FLAGS);
+					}
 				}
 			}
 		}
