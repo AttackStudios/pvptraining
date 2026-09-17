@@ -741,6 +741,11 @@ function onMessage(msg) {
     state.progress = msg.progress;
   } else if (msg.t === 'result') {
     if (msg.progress) state.progress = msg.progress;
+    // A result means the session is over. Do not wait for the next status message to say so:
+    // the Start button must be usable again straight away.
+    state.game.session = null;
+    state.pendingStart = false;
+    if (state.conn.state === 'live') setConn('ready');
     play(msg.medal > 0 || msg.won ? 'success' : 'finish');
     toast(msg.summary || 'Session finished.', msg.medal > 0 || msg.won ? 'good' : '', true);
     (msg.unlocked || []).forEach((id, i) => setTimeout(() => {

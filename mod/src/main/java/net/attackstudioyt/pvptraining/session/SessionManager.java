@@ -46,6 +46,7 @@ public final class SessionManager {
 	public static void stop() {
 		if (current != null && !current.isFinished()) current.end();
 		current = null;
+		Live.session = null;
 	}
 
 	public static void tick() {

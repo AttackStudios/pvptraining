@@ -99,7 +99,9 @@ public abstract class Session {
 				for (BotPlayer bot : bots) if (bot.brain != null) bot.brain.frozen = false;
 			}
 		} else live();
-		if (ticks % 5 == 0) publish();
+		// live() may have just ended the session: never publish a finished one, or the app
+		// would believe it is still running and refuse to start the next drill.
+		if (!finished && ticks % 5 == 0) publish();
 	}
 
 	private void sound(int n) {
@@ -176,6 +178,7 @@ public abstract class Session {
 
 	/** Pushes the current numbers to the app. Also called once at start so the app reacts before the first tick. */
 	void publish() {
+		if (finished) return;
 		JsonObject s = new JsonObject();
 		s.addProperty("mode", modeId);
 		s.addProperty("name", name());
