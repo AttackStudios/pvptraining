@@ -98,6 +98,15 @@ public class PVPTrainingClient implements ClientModInitializer {
 			case "stop" -> onServer(client, (server, player) -> SessionManager.stop());
 			// Test hook (-Dpvptraining.debug=true only): the trainee punches the nearest bot so an
 			// automated run can check that bots really get knocked back.
+			// Test hook (debug only): run a command as the trainee, so automated runs can drive /kit.
+			case "debugCommand" -> {
+				String command = msg.get("command").getAsString();
+				if (PVPTraining.DEBUG) onServer(client, (server, player) -> {
+					server.getCommandManager().parseAndExecute(player.getCommandSource(), command);
+					PVPTraining.LOG.info("[debugCommand] /{} -> main hand {}, slot0 {}, offhand {}", command,
+						player.getMainHandStack().getItem(), player.getInventory().getStack(0).getItem(), player.getOffHandStack().getItem());
+				});
+			}
 			case "debugHit" -> {
 				if (PVPTraining.DEBUG) onServer(client, (server, player) -> {
 					for (ServerPlayerEntity other : server.getPlayerManager().getPlayerList()) {

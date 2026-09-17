@@ -16,7 +16,13 @@ const path = require('path');
  * publishes for the asset, and only this one repository is ever consulted.
  */
 const REPO = 'AttackStudios/pvptraining';
-const ASSETS = { jar: 'pvptraining-mc1.21.11.jar', mac: 'PVPTraining-mac.zip', win: 'PVPTraining-win-x64.exe' };
+// Mac builds ship per chip rather than as one universal file: half the download for the
+// player, and release uploads small enough that GitHub reliably accepts them.
+const ASSETS = {
+  jar: 'pvptraining-mc1.21.11.jar',
+  mac: `PVPTraining-mac-${process.arch === 'arm64' ? 'arm64' : 'x64'}.zip`,
+  win: 'PVPTraining-win-x64.exe',
+};
 
 let emit = () => {};
 let staged = null; // { version, file } ready to apply

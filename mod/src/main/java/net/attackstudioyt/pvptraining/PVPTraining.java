@@ -79,6 +79,7 @@ public class PVPTraining implements ModInitializer {
 		});
 		ServerLivingEntityEvents.ALLOW_DEATH.register(PVPTraining::allowDeath);
 
+		CommandRegistrationCallback.EVENT.register((dispatcher, registry, env) -> KitCommands.register(dispatcher));
 		CommandRegistrationCallback.EVENT.register((dispatcher, registry, env) -> dispatcher.register(
 			CommandManager.literal("pvpt")
 				.then(CommandManager.literal("start")

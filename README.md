@@ -36,6 +36,14 @@ The same sessions can be started in game without the app:
 /pvpt stop
 ```
 
+## Custom kits
+
+`/kit edit <mace|cpvp|spear|elytra>` hands you the standard kit to rearrange. `/kit save <name> <mode>` stores the whole inventory (every slot, armour, off hand, with enchantments and components) in `~/.pvptraining/kits.json` and makes it the active kit for that mode, so it is what you get whenever a drill or duel starts. `/kit list`, `/kit use <name>`, `/kit load <name>`, `/kit default <mode>` and `/kit delete <name>` manage them. Bots always use the standard kit.
+
+## Auto update
+
+On every launch the app asks the GitHub API for the latest release of this repository. A newer mod jar is downloaded and copied into every mods folder the app previously installed into. A newer app build is downloaded in the background and applied on "Restart to update" or when the app is closed: Windows runs the NSIS installer silently, macOS swaps its own bundle (the builds are unsigned, so Squirrel is not an option). Downloads are verified against the SHA-256 digest GitHub publishes for each asset. Release assets must keep these exact names: `pvptraining-mc1.21.11.jar`, `PVPTraining-win-x64.exe`, `PVPTraining-mac-arm64.zip`, `PVPTraining-mac-x64.zip`.
+
 ## Building
 
 ```sh

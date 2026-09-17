@@ -1,6 +1,7 @@
 package net.attackstudioyt.pvptraining;
 
 import java.util.List;
+import net.attackstudioyt.pvptraining.bot.BotPlayer;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.FireworksComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -24,7 +25,13 @@ import net.minecraft.util.Unit;
 public final class Kits {
 	private Kits() {}
 
+	/** Hands out gear for a mode: the trainee's saved kit if they made one, else the standard kit. */
 	public static void give(ServerPlayerEntity player, String mode) {
+		give(player, mode, true);
+	}
+
+	/** @param allowCustom false forces the standard kit (bots, and /kit edit). */
+	public static void give(ServerPlayerEntity player, String mode, boolean allowCustom) {
 		player.getInventory().clear();
 		player.clearStatusEffects();
 		player.setHealth(player.getMaxHealth());
@@ -35,11 +42,15 @@ public final class Kits {
 		player.fallDistance = 0;
 		player.extinguish();
 
-		switch (mode) {
-			case "crystal" -> crystal(player);
-			case "spear" -> mace(player, true, false);
-			case "elytra_mace" -> mace(player, false, true);
-			default -> mace(player, false, false);
+		// Bots always fight with the standard kit so every tier stays comparable.
+		boolean custom = allowCustom && !(player instanceof BotPlayer) && CustomKits.apply(player, mode, CustomKits.active(mode));
+		if (!custom) {
+			switch (mode) {
+				case "crystal" -> crystal(player);
+				case "spear" -> mace(player, true, false);
+				case "elytra_mace" -> mace(player, false, true);
+				default -> mace(player, false, false);
+			}
 		}
 		player.currentScreenHandler.sendContentUpdates();
 		player.playerScreenHandler.syncState();
