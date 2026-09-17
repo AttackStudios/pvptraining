@@ -35,6 +35,13 @@ dependencies {
 	include "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 }
 
+// Runs the real remapped jar on a production-style client (intermediary names, no dev
+// classpath): the closest thing to a launcher without leaving Gradle. ./gradlew prodClient
+tasks.register("prodClient", net.fabricmc.loom.task.prod.ClientProductionRunTask) {
+	mods.from(tasks.remapJar)
+	jvmArgs.add("-Dpvptraining.debug=true")
+}
+
 processResources {
 	inputs.property "version", project.version
 	filesMatching("fabric.mod.json") { expand "version": inputs.properties.version }
