@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PVPTraining: the Minecraft combat masterclass</title>
+<meta name="description" content="A desktop app and Fabric 1.21.11 mod that drop you into a ready-made practice world with bots that fight like players. Mace and Crystal, with Spear and Elytra + Mace skill branches." />
+<meta property="og:title" content="PVPTraining" />
+<meta property="og:description" content="Train Mace and Crystal PvP against bots that fight like players. Fabric 1.21.11." />
+<meta property="og:image" content="https://attackstudios.github.io/pvptraining/assets/shot-train.png" />
+<link rel="icon" href="assets/icon.png" />
+<style>
+:root{--bg:#090b10;--surface:rgba(255,255,255,.035);--surface2:rgba(255,255,255,.06);--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.16);--text:#eef1f7;--text2:#a4acbd;--text3:#6b7385;--ember:#ff6a3d;--ember2:#ffb23e;--mace:#ffb23e;--crystal:#e86bff;--spear:#35e0c2;--ely:#7aa5ff;--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.56,.64,1)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit;text-decoration:none}h1,h2,h3,p{margin:0}
+.wrap{width:min(1120px,100% - 40px);margin:0 auto}
+.glow{position:fixed;width:820px;height:820px;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0;opacity:.2}
+.glow.a{background:var(--ember);top:-460px;right:-260px;animation:da 24s ease-in-out infinite alternate}
+.glow.b{background:var(--ember2);bottom:-560px;left:-300px;opacity:.1;animation:db 30s ease-in-out infinite alternate}
+@keyframes da{to{transform:translate(-100px,80px) scale(1.1)}}@keyframes db{to{transform:translate(120px,-70px) scale(1.15)}}
+main,header,footer{position:relative;z-index:1}
+header{position:sticky;top:0;z-index:20;backdrop-filter:blur(18px);background:rgba(9,11,16,.72);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.02em}.brand img{width:28px;height:28px;border-radius:8px}.brand b{font-weight:500;color:var(--text2)}
+.links{display:flex;gap:26px;font-size:14.5px;color:var(--text2);font-weight:550}.links a{transition:color .2s}.links a:hover{color:var(--text)}
+.pill{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 11px;border-radius:99px;font-size:11.5px;font-weight:650;color:var(--text3);background:rgba(255,255,255,.04);border:1px solid var(--line);cursor:not-allowed;opacity:.8;user-select:none}
+.pill svg{width:11px;height:11px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:52px;padding:0 26px;border-radius:15px;font-weight:700;font-size:15.5px;border:1px solid var(--line);background:var(--surface2);transition:transform .25s var(--spring),box-shadow .3s,background .2s,border-color .2s;cursor:pointer}
+.btn:hover{transform:translateY(-2px);border-color:var(--line2);background:rgba(255,255,255,.1)}.btn:active{transform:scale(.98)}
+.btn.primary{color:#160a04;border-color:transparent;background:linear-gradient(135deg,var(--ember2),var(--ember));box-shadow:0 14px 40px -14px var(--ember),inset 0 1px 0 rgba(255,255,255,.35)}
+.btn.primary:hover{box-shadow:0 20px 50px -14px var(--ember),inset 0 1px 0 rgba(255,255,255,.45);background:linear-gradient(135deg,var(--ember2),var(--ember))}
+.btn svg{width:18px;height:18px}.btn small{display:block;font-size:11.5px;font-weight:550;opacity:.75;margin-top:-3px}.btn span{text-align:left;line-height:1.25}
+.hero{padding:96px 0 40px;text-align:center}
+.eyebrow{font-size:12px;font-weight:750;letter-spacing:.2em;text-transform:uppercase;color:var(--ember2)}
+h1{font-size:clamp(40px,6.4vw,76px);line-height:1.02;font-weight:850;letter-spacing:-.04em;margin:18px auto 20px;max-width:900px}
+h1 em{font-style:normal;background:linear-gradient(120deg,var(--ember2),var(--ember));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{font-size:clamp(16px,1.6vw,19px);color:var(--text2);max-width:640px;margin:0 auto 34px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.sub{margin-top:18px;color:var(--text3);font-size:13.5px}
+.shot{margin:64px auto 0;border-radius:20px;border:1px solid var(--line2);overflow:hidden;box-shadow:0 60px 140px -60px rgba(255,106,61,.45),0 30px 80px -30px #000;transform:perspective(1600px) rotateX(5deg);transition:transform 1.2s var(--ease)}
+.shot:hover{transform:perspective(1600px) rotateX(0)}.shot img{display:block;width:100%}
+section{padding:96px 0 0}
+h2{font-size:clamp(28px,3.6vw,42px);font-weight:820;letter-spacing:-.03em;line-height:1.1;margin-top:12px}
+.sec-sub{color:var(--text2);max-width:620px;margin-top:12px}
+.grid{display:grid;gap:16px;margin-top:40px}.g3{grid-template-columns:repeat(3,minmax(0,1fr))}.g2{grid-template-columns:repeat(2,minmax(0,1fr))}.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.card{position:relative;padding:26px;border-radius:20px;border:1px solid var(--line);background:var(--surface);overflow:hidden;transition:transform .5s var(--ease),border-color .3s,box-shadow .5s;--c:var(--ember)}
+.card::before{content:"";position:absolute;inset:0;background:radial-gradient(420px 200px at 100% 0,color-mix(in srgb,var(--c) 20%,transparent),transparent 70%);opacity:.6;transition:opacity .3s}
+.card>*{position:relative}.card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--c) 55%,transparent);box-shadow:0 30px 60px -34px var(--c)}.card:hover::before{opacity:1}
+.card h3{font-size:19px;font-weight:760;letter-spacing:-.015em;margin:14px 0 6px}.card p{color:var(--text2);font-size:14.5px}
+.num{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:800;color:#160a04;background:linear-gradient(135deg,var(--ember2),var(--ember))}
+.glyph{width:50px;height:50px;border-radius:15px;display:grid;place-items:center;color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);border:1px solid color-mix(in srgb,var(--c) 38%,transparent)}.glyph svg{width:28px;height:28px}
+.kind{font-size:11px;font-weight:750;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin-top:14px;display:block}
+.card .kind+h3{margin-top:2px}
+ul.drills{list-style:none;padding:0;margin:14px 0 0;display:flex;flex-direction:column;gap:7px;font-size:13.5px;color:var(--text2)}
+ul.drills li{display:flex;gap:9px}ul.drills li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--c);margin-top:8px;flex:none}
+.locknote{display:inline-flex;align-items:center;gap:7px;margin-top:14px;font-size:12.5px;font-weight:650;color:var(--text3)}.locknote svg{width:13px;height:13px}
+.tabs{display:flex;gap:8px;margin-top:36px;flex-wrap:wrap}
+.tab{height:44px;padding:0 18px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text2);font:inherit;font-weight:650;font-size:14.5px;cursor:pointer;display:inline-flex;align-items:center;gap:9px;transition:all .25s var(--ease)}
+.tab svg{width:20px;height:20px}.tab:hover{color:var(--text);border-color:var(--line2)}
+.tab.on{color:var(--text);border-color:var(--b);background:color-mix(in srgb,var(--b) 12%,transparent);box-shadow:0 14px 34px -20px var(--b)}
+.panel{display:none;margin-top:16px;padding:30px;border-radius:20px;border:1px solid color-mix(in srgb,var(--b) 35%,transparent);background:linear-gradient(140deg,color-mix(in srgb,var(--b) 8%,transparent),transparent 55%),var(--surface)}
+.panel.on{display:block;animation:rise .6s var(--ease)}@keyframes rise{from{opacity:0;transform:translateY(14px)}}
+.panel ol{margin:0;padding:0;list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:14px}
+.panel li{counter-increment:s;display:grid;grid-template-columns:36px 1fr;gap:14px;color:var(--text2);font-size:15px}
+.panel li::before{content:counter(s);width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-weight:800;color:#0b0d12;background:var(--b)}
+.panel li b{color:var(--text);font-weight:650}.panel .note{margin-top:20px;font-size:13.5px;color:var(--text3)}
+.dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:40px}
+.dl .card{display:flex;flex-direction:column}.dl .card p{flex:1}.dl .btn{margin-top:20px;width:100%}
+.req{margin-top:22px;display:flex;gap:10px;flex-wrap:wrap}.chip{display:inline-flex;align-items:center;height:30px;padding:0 13px;border-radius:99px;font-size:13px;font-weight:600;color:var(--text2);background:rgba(255,255,255,.05);border:1px solid var(--line)}
+details{border-bottom:1px solid var(--line);padding:18px 0}summary{cursor:pointer;font-weight:680;font-size:16.5px;list-style:none;display:flex;justify-content:space-between;gap:20px}
+summary::after{content:"+";color:var(--text3);font-weight:400;font-size:22px;line-height:1;transition:transform .3s var(--ease)}details[open] summary::after{transform:rotate(45deg)}
+details p{color:var(--text2);margin-top:10px;max-width:760px;font-size:15px}
+footer{margin-top:110px;padding:34px 0 50px;border-top:1px solid var(--line);color:var(--text3);font-size:13.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .9s var(--ease),transform .9s var(--ease)}.reveal.in{opacity:1;transform:none}
+@media(max-width:860px){.g3,.g4,.dl{grid-template-columns:1fr}.g2{grid-template-columns:1fr}.links{display:none}.hero{padding-top:64px}section{padding-top:72px}.shot{transform:none}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<div class="glow a"></div><div class="glow b"></div>
+
+<header><div class="wrap nav">
+  <a class="brand" href="#top"><img src="assets/icon.png" alt="" />PVP<b>Training</b></a>
+  <nav class="links"><a href="#how">How it works</a><a href="#modes">Gamemodes</a><a href="#setup">Install</a><a href="#download">Download</a><a href="#faq">FAQ</a></nav>
+  <span class="pill" title="More versions are coming. For now it is Fabric 1.21.11 only."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Fabric 1.21.11</span>
+</div></header>
+
+<main id="top">
+<div class="wrap hero">
+  <span class="eyebrow">Minecraft combat masterclass</span>
+  <h1>Train like you mean it. Become a combat <em>Ace</em>.</h1>
+  <p class="lede">PVPTraining hooks into your game, drops you into a ready-made practice world and puts you up against bots that fight like players. Drills, duels and skill branches that unlock as you master each kit.</p>
+  <div class="cta">
+    <a class="btn primary" href="#download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="m7 10.500 5 5 5-5"/><path d="M5 20h14"/></svg>Download</a>
+    <a class="btn" href="#how">See how it works</a>
+  </div>
+  <p class="sub">Free. Windows and macOS. Needs Minecraft Java 1.21.11 with Fabric.</p>
+  <div class="shot reveal"><img src="assets/shot-train.png" alt="The PVPTraining app connected to Minecraft, showing the Mace and Crystal gamemodes" /></div>
+</div>
+
+<section id="how"><div class="wrap">
+  <span class="eyebrow">How it works</span>
+  <h2>One click from the title screen to the arena</h2>
+  <p class="sec-sub">There is no server to join and no world to download. The mod carries the practice world and the bots inside it.</p>
+  <div class="grid g3">
+    <div class="card reveal"><div class="num">1</div><h3>Add the mod</h3><p>The app asks which launcher you use and walks you through it. On Modrinth and the standard launcher it installs the file for you.</p></div>
+    <div class="card reveal"><div class="num">2</div><h3>Launch, then press Connect</h3><p>Start Minecraft 1.21.11 with Fabric. The app finds the running game on your computer, connects to it and opens the practice world for you.</p></div>
+    <div class="card reveal"><div class="num">3</div><h3>Pick a drill or a duel</h3><p>Choose it in the app and it starts in your game. Your score, medals and mastery update live while you play.</p></div>
+  </div>
+</div></section>
+
+<section id="modes"><div class="wrap">
+  <span class="eyebrow">Gamemodes and skill branches</span>
+  <h2>Start with two kits. Earn the rest.</h2>
+  <p class="sec-sub">Every mode has three scored drills and a five-tier bot ladder from Rookie to Ace. Reach 80% mastery and beat the Elite bot to unlock a mode's branches.</p>
+  <div class="grid g2">
+    <div class="card reveal" style="--c:var(--mace)"><div class="glyph"><svg viewBox="0 0 32 32" fill="none"><path d="M6 26 17 15" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><rect x="14.500" y="4.500" width="13" height="13" rx="3.200" fill="currentColor" opacity=".22" stroke="currentColor" stroke-width="2.200"/><path d="M21 2.500v3.500M21 16v3.500M12.500 11H16M26 11h3.500" stroke="currentColor" stroke-width="2.400" stroke-linecap="round"/></svg></div>
+      <span class="kind">Gamemode</span><h3>Mace</h3><p>The base MacePvP kit: Density and Breach maces, wind charges, sword and axe, shield, pearls, and an elytra with no rockets.</p>
+      <ul class="drills"><li>Launch &amp; Smash: total smash damage over 10 attempts</li><li>Moving Target: smashes on a dodging dummy in 60 seconds</li><li>Smash Chain: longest back-to-back chain</li></ul></div>
+    <div class="card reveal" style="--c:var(--crystal)"><div class="glyph"><svg viewBox="0 0 32 32" fill="none"><path d="M16 3 25 12l-9 17-9-17 9-9Z" fill="currentColor" opacity=".2"/><path d="M16 3 25 12l-9 17-9-17 9-9Z" stroke="currentColor" stroke-width="2.200" stroke-linejoin="round"/><path d="M7 12h18M16 3l-3.500 9L16 29l3.500-17L16 3Z" stroke="currentColor" stroke-width="1.600" stroke-linejoin="round" opacity=".8"/></svg></div>
+      <span class="kind">Gamemode</span><h3>Crystal</h3><p>Standard Crystal PvP kit on an obsidian pit: netherite, totems, end crystals, obsidian, anchors and glowstone.</p>
+      <ul class="drills"><li>Place &amp; Pop: crystals detonated in 30 seconds</li><li>Totem Breaker: pops on a dummy that re-totems instantly</li><li>Under Fire: survive a bot that crystals you non-stop</li></ul></div>
+    <div class="card reveal" style="--c:var(--spear)"><div class="glyph"><svg viewBox="0 0 32 32" fill="none"><path d="M5 27 20 12" stroke="currentColor" stroke-width="2.600" stroke-linecap="round"/><path d="M28 4 25.500 13 19 6.500 28 4Z" fill="currentColor" opacity=".25" stroke="currentColor" stroke-width="2.200" stroke-linejoin="round"/></svg></div>
+      <span class="kind">Mace branch</span><h3>Spear</h3><p>Mace kit without the elytra, plus a Lunge III spear. Built around attribute swapping: select the spear and jab in the same tick so the lunge cooldown almost disappears.</p>
+      <ul class="drills"><li>Lunge Lines: lunge through rings</li><li>Attribute Swap: lunges in 30 seconds</li><li>Lunge Into Smash: close the gap, launch, smash</li></ul>
+      <span class="locknote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Unlocks when you master Mace</span></div>
+    <div class="card reveal" style="--c:var(--ely)"><div class="glyph"><svg viewBox="0 0 32 32" fill="none"><path d="M16 7c-2.500-3-7-3.500-11-1.500C6 12 7 19 12.500 26c1-5 2-8 3.500-10.500M16 7c2.500-3 7-3.500 11-1.500C26 12 25 19 19.500 26c-1-5-2-8-3.500-10.500M16 7v8.500" stroke="currentColor" stroke-width="2.100" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <span class="kind">Mace branch</span><h3>Elytra + Mace</h3><p>Mace kit plus rockets. Wings on, climb, wait a beat, look back down, rocket at the target, wings off at the last moment, smash.</p>
+      <ul class="drills"><li>Takeoff: fastest climb to the marker</li><li>Dive Bomb: smash damage over 6 dives</li><li>Full Sequence: clean dives on a moving target</li></ul>
+      <span class="locknote"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2.500"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Unlocks when you master Mace</span></div>
+  </div>
+  <div class="grid g2" style="align-items:center;margin-top:56px">
+    <div class="reveal"><span class="eyebrow">Bots that scale</span><h2 style="font-size:30px">Rookie to Ace</h2><p class="sec-sub">One difficulty number drives reaction time, aim error, crit timing, how often the bot dives, how fast it re-totems and how quickly it places and pops crystals. The Ace spear bot re-lunges as fast as a player who has the swap down.</p></div>
+    <div class="shot reveal" style="margin:0;transform:none"><img src="assets/shot-tree.png" alt="The skill tree: Mace leads to Spear and Elytra + Mace" /></div>
+  </div>
+</div></section>
+
+<section id="setup"><div class="wrap">
+  <span class="eyebrow">Install the mod</span>
+  <h2>Pick your launcher</h2>
+  <p class="sec-sub">The app shows this same guide on first launch, with the mod file ready to drag out. You always need a <b>Fabric 1.21.11</b> profile.</p>
+  <div class="tabs" role="tablist">
+    <button class="tab on" style="--b:#FFB02B" data-tab="dawn">Dawn</button>
+    <button class="tab" style="--b:#00C3FF" data-tab="lunar">Lunar Client</button>
+    <button class="tab" style="--b:#1BD96A" data-tab="modrinth">Modrinth App</button>
+    <button class="tab" style="--b:#c5cbd9" data-tab="other">Other</button>
+  </div>
+  <div class="panel on" style="--b:#FFB02B" id="p-dawn"><ol>
+    <li><span>Open the <b>Profiles</b> tab and create a new profile: <b>Java</b>, then <b>Custom profile</b>.</span></li>
+    <li><span>Keep the loader on <b>Fabric</b>, pick game version <b>1.21.11</b> and create it.</span></li>
+    <li><span>Press the gear on the profile, then <b>Edit</b>. Open the profile folder and drop the PVPTraining jar into <b>mods</b>.</span></li>
+    <li><span>Launch the profile, wait for the title screen, then press <b>Connect</b> in the app.</span></li></ol>
+    <p class="note">Dawn is the MCPVP launcher that replaced Feather. It is new, so button names may shift between updates.</p></div>
+  <div class="panel" style="--b:#00C3FF" id="p-lunar"><ol>
+    <li><span>Open the <b>version selector</b>, choose <b>1.21.11</b> and select the <b>Fabric</b> add-on.</span></li>
+    <li><span>Press the <b>gear</b> at the bottom right, then <b>Mods</b>.</span></li>
+    <li><span><b>Drag the PVPTraining jar</b> onto the Mods panel and keep it enabled.</span></li>
+    <li><span>Press <b>Launch</b>, wait for the title screen, then press <b>Connect</b> in the app.</span></li></ol>
+    <p class="note">Lunar only loads your own mods when the Fabric add-on is selected.</p></div>
+  <div class="panel" style="--b:#1BD96A" id="p-modrinth"><ol>
+    <li><span>Create an instance with loader <b>Fabric</b> and game version <b>1.21.11</b>.</span></li>
+    <li><span>In the PVPTraining app, pick that instance and press <b>Install</b>. By hand: instance, <b>Content</b>, the arrow beside <b>Install content</b>, <b>Add from file</b>.</span></li>
+    <li><span>Press <b>Play</b>, wait for the title screen, then press <b>Connect</b> in the app.</span></li></ol>
+    <p class="note">The instance has to be a Fabric one. A vanilla instance does not show mod options.</p></div>
+  <div class="panel" style="--b:#c5cbd9" id="p-other"><ol>
+    <li><span>Install Fabric for <b>1.21.11</b>. This video walks through it: <a href="https://www.youtube.com/watch?v=y4ufGPTw_G4" target="_blank" rel="noopener" style="color:#ff6b6b;font-weight:650">How To Download &amp; Install Fabric Mods (1.21.11)</a>.</span></li>
+    <li><span>Put the PVPTraining jar in your <b>mods</b> folder. With the standard Minecraft Launcher the app can do this for you.</span></li>
+    <li><span>Start the Fabric 1.21.11 installation, wait for the title screen, then press <b>Connect</b> in the app.</span></li></ol>
+    <p class="note">Default folders: <code>%APPDATA%\.minecraft\mods</code> on Windows, <code>~/Library/Application Support/minecraft/mods</code> on macOS.</p></div>
+</div></section>
+
+<section id="download"><div class="wrap">
+  <span class="eyebrow">Download</span>
+  <h2>Get the app. The mod comes with it.</h2>
+  <p class="sec-sub">The mod file is bundled inside the app, and the install guide hands it to you. It is also here on its own.</p>
+  <div class="dl">
+    <div class="card reveal"><h3 style="margin-top:0">macOS</h3><p>Universal build for Apple Silicon and Intel. Open the dmg and drag PVPTraining to Applications. First launch: right-click the app and choose Open.</p><a class="btn primary" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/PVPTraining-mac.dmg">Download for Mac</a></div>
+    <div class="card reveal"><h3 style="margin-top:0">Windows</h3><p>64-bit installer for Windows 10 and 11. If SmartScreen appears, choose More info, then Run anyway. The app is not code-signed yet.</p><a class="btn primary" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/PVPTraining-win-x64.exe">Download for Windows</a></div>
+    <div class="card reveal"><h3 style="margin-top:0">Mod only</h3><p>The Fabric mod jar by itself. Fabric API is inside it, so this one file is all your mods folder needs.</p><a class="btn" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/pvptraining-mc1.21.11.jar">Download the jar</a></div>
+  </div>
+  <div class="req"><span class="chip">Minecraft Java 1.21.11 only</span><span class="chip">Fabric Loader 0.18 or newer</span><span class="chip">Java 21</span><span class="chip">Single-player: nothing to host</span></div>
+</div></section>
+
+<section id="faq"><div class="wrap">
+  <span class="eyebrow">FAQ</span>
+  <h2>Good to know</h2>
+  <div style="margin-top:26px">
+    <details><summary>Why only 1.21.11?</summary><p>The spear, Lunge and the current attribute-swap timing all live in 1.21.11, and the bots are written against that exact version. The mod refuses to load on anything else so you never train against wrong mechanics. More versions will follow, and the greyed-out version picker in the app becomes a real one when they do.</p></details>
+    <details><summary>Will this get me banned anywhere?</summary><p>The mod does nothing on servers. It only acts inside its own single-player practice world. If a server or launcher forbids unknown mods, use a separate profile for training.</p></details>
+    <details><summary>How does the app find my game?</summary><p>When Minecraft starts with the mod, it opens a connection that only this computer can reach and writes a small file with a one-time key into your user folder. The app reads that key to connect. Nothing leaves your machine.</p></details>
+    <details><summary>How do branches unlock?</summary><p>Mastery is half drill medals and half the toughest bot you have beaten in a first-to-3 duel. Reach 80% in Mace and beat the Elite bot, and Spear and Elytra + Mace unlock. Crystal has no branches yet.</p></details>
+    <details><summary>Can I train without the app open?</summary><p>Yes. Once you are in the PVPTraining world, <code>/pvpt start mace drill mace_smash</code> or <code>/pvpt start crystal duel veteran</code> starts a session, and <code>/pvpt stop</code> ends it.</p></details>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap"><span>PVPTraining by AttackStudios. Not affiliated with Mojang, Microsoft, Dawn, Lunar Client or Modrinth.</span><a href="https://github.com/AttackStudios/pvptraining">Source on GitHub</a></div></footer>
+
+<script>
+document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){
+  document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x===t)});
+  document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t.dataset.tab)});
+})});
+var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+document.querySelectorAll('.reveal').forEach(function(el,i){el.style.transitionDelay=(i%3)*70+'ms';io.observe(el)});
+(function(){var mac=/Mac/.test(navigator.platform||navigator.userAgent);var a=document.querySelector('.cta .primary');if(a)a.lastChild.textContent=mac?'Download for Mac':/Win/.test(navigator.platform||navigator.userAgent)?'Download for Windows':'Download'})();
+</script>
+</body>
+</html>

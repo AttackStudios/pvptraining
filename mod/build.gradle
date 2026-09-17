@@ -15,6 +15,7 @@ loom {
 	runs {
 		client {
 			vmArg "-XstartOnFirstThread"
+			vmArg "-Dpvptraining.debug=true"
 			programArgs("--username", "Trainee")
 		}
 	}

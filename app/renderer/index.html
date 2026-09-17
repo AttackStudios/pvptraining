@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PVPTraining</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="brands.css" />
+  </head>
+  <body>
+    <div class="backdrop" aria-hidden="true">
+      <div class="glow glow-a"></div>
+      <div class="glow glow-b"></div>
+      <div class="grain"></div>
+    </div>
+    <header class="titlebar">
+      <div class="titlebar-brand">
+        <span class="mark" data-icon="logo"></span>
+        <span class="wordmark">PVP<b>Training</b></span>
+      </div>
+      <div class="titlebar-right">
+        <button class="icon-btn" id="sound" data-sfx="click" aria-label="Toggle sound"></button>
+        <span class="version-pill" title="More versions are coming. For now PVPTraining is built for Fabric 1.21.11 only." aria-disabled="true">
+          <span data-icon="lock"></span>Fabric 1.21.11
+        </span>
+      </div>
+    </header>
+    <main id="stage"></main>
+    <div id="toasts" aria-live="polite"></div>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>

@@ -6,3 +6,6 @@ dist/
 release/
 *.log
 .DS_Store
+node_modules
+app/resources/mod/*.jar
+shots/

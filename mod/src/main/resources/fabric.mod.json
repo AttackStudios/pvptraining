@@ -1,0 +1,23 @@
+{
+	"schemaVersion": 1,
+	"id": "pvptraining",
+	"version": "${version}",
+	"name": "PVPTraining",
+	"description": "Companion mod for the PVPTraining app. Opens the practice world, runs the training bots and drills, and talks to the desktop app over a local connection.",
+	"authors": ["AttackStudios"],
+	"contact": { "homepage": "https://attackstudios.github.io/pvptraining/" },
+	"license": "MIT",
+	"icon": "assets/pvptraining/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"main": ["net.attackstudioyt.pvptraining.PVPTraining"],
+		"client": ["net.attackstudioyt.pvptraining.client.PVPTrainingClient"]
+	},
+	"mixins": ["pvptraining.mixins.json"],
+	"depends": {
+		"fabricloader": ">=0.18.0",
+		"minecraft": "1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
