@@ -83,7 +83,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 
 <header><div class="wrap nav">
   <a class="brand" href="#top"><img src="assets/icon.png" alt="" /><span>PVP<b>Training</b></span></a>
-  <nav class="links"><a href="#how">How it works</a><a href="#modes">Gamemodes</a><a href="#setup">Install</a><a href="#download">Download</a><a href="#faq">FAQ</a></nav>
+  <nav class="links"><a href="#how">How it works</a><a href="#modes">Gamemodes</a><a href="#friends">Friends</a><a href="#setup">Install</a><a href="#download">Download</a><a href="#faq">FAQ</a></nav>
   <span class="pill" title="More versions are coming. For now it is Fabric 1.21.11 only."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="11" width="14" height="9" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>Fabric 1.21.11</span>
 </div></header>
 
@@ -146,6 +146,22 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   <div class="grid g2" style="align-items:center;margin-top:56px">
     <div class="reveal"><span class="eyebrow">Bots that scale</span><h2 style="font-size:30px">Rookie to Ace</h2><p class="sec-sub">One difficulty number drives reaction time, aim error, crit timing, how often the bot dives, how fast it re-totems and how quickly it places and pops crystals. The Ace spear bot re-lunges as fast as a player who has the swap down.</p></div>
     <div class="shot reveal" style="margin:0;transform:none"><img src="assets/shot-tree.jpg" alt="The skill tree: Mace leads to Spear and Elytra + Mace" /></div>
+  </div>
+</div></section>
+
+<section id="friends"><div class="wrap">
+  <span class="eyebrow">Friends</span>
+  <h2>Train alone. Compete together.</h2>
+  <p class="sec-sub">Sign in with your Minecraft account, add friends by code, and see exactly who is better at what.</p>
+  <div class="grid g4">
+    <div class="card reveal"><h3 style="margin-top:0">Friends and messages</h3><p>Add friends with a six-letter code or their exact name. Messages only work between accepted friends, and you can remove or block anyone.</p></div>
+    <div class="card reveal"><h3 style="margin-top:0">Compare</h3><p>Every gamemode and drill side by side: mastery, best scores and medals, with the winner of each highlighted.</p></div>
+    <div class="card reveal"><h3 style="margin-top:0">Challenges</h3><p>Pick a drill and challenge a friend. You both have 48 hours, best score wins, and the leader updates live.</p></div>
+    <div class="card reveal"><h3 style="margin-top:0">Leaderboards</h3><p>Total mastery, mastery per gamemode, or any single drill, against everyone or just your friends.</p></div>
+  </div>
+  <div class="grid g2">
+    <figure class="shot reveal" style="margin:0;transform:none"><img loading="lazy" src="assets/shot-compare.jpg" alt="Comparing stats with a friend, drill by drill" /></figure>
+    <figure class="shot reveal" style="margin:0;transform:none"><img loading="lazy" src="assets/shot-chat.jpg" alt="A message thread with a friend" /></figure>
   </div>
 </div></section>
 
@@ -214,6 +230,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
     <details><summary>Why only 1.21.11?</summary><p>The spear, Lunge and the current attribute-swap timing all live in 1.21.11, and the bots are written against that exact version. The mod refuses to load on anything else so you never train against wrong mechanics. More versions will follow, and the greyed-out version picker in the app becomes a real one when they do.</p></details>
     <details><summary>Will this get me banned anywhere?</summary><p>The mod does nothing on servers. It only acts inside its own single-player practice world. If a server or launcher forbids unknown mods, use a separate profile for training.</p></details>
     <details><summary>How does the app find my game?</summary><p>When Minecraft starts with the mod, it opens a connection that only this computer can reach and writes a small file with a one-time key into your user folder. The app reads that key to connect. Nothing leaves your machine.</p></details>
+    <details><summary>How does signing in work, and what is stored?</summary><p>There is no password. Your game proves the account is yours the same way it does when you join a server: it tells Mojang it is joining a one-time code, and the friends service checks that with Mojang. Your login token never leaves the game. The service stores your Minecraft name and ID, your training stats, your friends list, and messages you send to friends (the last 200 per conversation). Nothing else. Friends and leaderboards are optional: the app trains you fine without signing in.</p></details>
     <details><summary>Can I use my own hotbar layout?</summary><p>Yes. In the practice world run <code>/kit edit mace</code> (or <code>cpvp</code>, <code>spear</code>, <code>elytra</code>) to get the standard kit, arrange it how you like, then <code>/kit save main mace</code>. Your whole inventory is saved and loaded every time a drill or duel in that mode starts. <code>/kit list</code>, <code>/kit use</code>, <code>/kit default</code> and <code>/kit delete</code> manage them. Bots always use the standard kit.</p></details>
     <details><summary>How do updates work?</summary><p>Every time the app starts it checks GitHub for the latest release. A newer mod is pulled straight away and dropped into any mods folder the app installed it to. A newer app downloads in the background: press Restart to update, or just close the app and it installs itself. Every download is checked against the checksum GitHub publishes for it.</p></details>
     <details><summary>How do branches unlock?</summary><p>Mastery is half drill medals and half the toughest bot you have beaten in a first-to-3 duel. Reach 80% in Mace and beat the Elite bot, and Spear and Elytra + Mace unlock. Crystal has no branches yet.</p></details>
