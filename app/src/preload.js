@@ -23,6 +23,11 @@ contextBridge.exposeInMainWorld('pvpt', {
     pick: call('installer:pick'),
     drag: () => ipcRenderer.send('installer:drag'),
   },
+  update: {
+    get: call('update:get'),
+    apply: call('update:apply'),
+    onStatus: (fn) => ipcRenderer.on('update:status', (_e, status) => fn(status)),
+  },
   open: call('shell:open'),
   openPath: call('shell:openPath'),
 });

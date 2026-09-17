@@ -782,6 +782,38 @@ function wireSoundToggle() {
   };
 }
 
+function wireUpdates() {
+  const pill = $('#update');
+  const paint = (st) => {
+    if (!st) return;
+    pill.classList.toggle('ready', st.state === 'ready' || st.state === 'manual');
+    pill.onclick = null;
+    if (st.state === 'downloading') {
+      pill.hidden = false;
+      pill.textContent = `${st.what === 'mod' ? 'Updating mod' : `Downloading ${st.version}`} ${st.percent}%`;
+    } else if (st.state === 'ready') {
+      pill.hidden = false;
+      pill.textContent = `Restart to update to ${st.version}`;
+      pill.title = 'The update also installs by itself the next time you close the app.';
+      pill.onclick = () => api.update.apply();
+    } else if (st.state === 'manual') {
+      pill.hidden = false;
+      pill.textContent = `${st.version} is out`;
+      pill.title = st.reason || '';
+      pill.onclick = () => api.open(st.url);
+    } else if (st.state === 'mod-updated') {
+      pill.hidden = true;
+      toast(st.refreshed ? `Mod updated to ${st.version} in ${st.refreshed} folder${st.refreshed > 1 ? 's' : ''}. Restart Minecraft to use it.` : `Newer mod ${st.version} downloaded. Reinstall it from Setup.`, 'good');
+      api.info().then((info) => (state.info = info));
+    } else if (st.state === 'error') {
+      pill.hidden = true;
+      toast(`Update failed: ${st.message}`, 'bad');
+    } else pill.hidden = true;
+  };
+  api.update.onStatus(paint);
+  api.update.get().then(paint);
+}
+
 async function boot() {
   [state.info, state.settings, state.catalog, state.progress] = await Promise.all([api.info(), api.settings.get(), api.catalog(), api.progress()]);
   if (state.info.platform === 'win32') document.body.classList.add('win');
@@ -789,6 +821,7 @@ async function boot() {
   setMuted(state.settings.muted);
   wireGlobalSounds();
   wireSoundToggle();
+  wireUpdates();
   api.bridge.onMessage(onMessage);
   api.bridge.onStatus(onStatus);
   window.__pvpt = { state, showWelcome, showPicker, showGuide, showShell, goPage, renderPage, setConn, onMessage };

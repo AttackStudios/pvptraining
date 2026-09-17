@@ -1,7 +1,7 @@
 {
   "name": "pvptraining",
   "productName": "PVPTraining",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "PVPTraining",
   "author": "AttackStudios",
@@ -31,7 +31,7 @@
     "extraResources": [{ "from": "resources", "to": "." }],
     "mac": {
       "category": "public.app-category.games",
-      "target": [{ "target": "dmg", "arch": ["universal"] }],
+      "target": [{ "target": "dmg", "arch": ["universal"] }, { "target": "zip", "arch": ["universal"] }],
       "identity": null
     },
     "dmg": { "title": "PVPTraining" },

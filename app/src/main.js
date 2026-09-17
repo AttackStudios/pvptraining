@@ -5,6 +5,7 @@ const os = require('os');
 const { Bridge } = require('./bridge');
 const discovery = require('./discovery');
 const installer = require('./installer');
+const updater = require('./updater');
 
 const HOME_DIR = path.join(os.homedir(), '.pvptraining');
 const SHOTS = process.argv.includes('--shots');
@@ -12,6 +13,7 @@ const APP_ICON = path.join(__dirname, 'app-icon.png');
 
 let win = null;
 let bridge = null;
+let lastUpdate = { state: 'idle' };
 
 function settingsPath() {
   return path.join(app.getPath('userData'), 'settings.json');
@@ -34,7 +36,10 @@ function resourcesDir() {
   return app.isPackaged ? process.resourcesPath : path.join(__dirname, '..', 'resources');
 }
 
+/** The mod jar the guides hand out: a newer one pulled from GitHub if we have it, else the shipped one. */
 function bundledJar() {
+  const pulled = updater.downloadedJar(readSettings());
+  if (pulled) return pulled;
   const dir = path.join(resourcesDir(), 'mod');
   try {
     const jar = fs.readdirSync(dir).filter((f) => f.endsWith('.jar')).sort().pop();
@@ -129,7 +134,18 @@ function wireIpc() {
   });
 
   ipcMain.handle('installer:targets', (_e, launcher) => installer.targets(launcher));
-  ipcMain.handle('installer:install', (_e, dir) => installer.install(bundledJar(), dir));
+  ipcMain.handle('installer:install', (_e, dir) => {
+    const res = installer.install(bundledJar(), dir);
+    if (res.ok) {
+      // Remember the folder so a newer mod pulled from GitHub can be dropped in automatically.
+      const dirs = new Set(readSettings().installedDirs || []);
+      dirs.add(dir);
+      writeSettings({ ...readSettings(), installedDirs: [...dirs] });
+    }
+    return res;
+  });
+  ipcMain.handle('update:get', () => lastUpdate);
+  ipcMain.handle('update:apply', () => updater.apply(true));
   ipcMain.handle('installer:reveal', () => {
     const jar = bundledJar();
     if (!jar) return false;
@@ -180,9 +196,29 @@ app.whenReady().then(() => {
   wireIpc();
   createWindow();
   if (SHOTS) require('./shots').run(win);
+  else {
+    updater.run({
+      send: (status) => {
+        lastUpdate = status;
+        if (status.state !== 'downloading' || status.percent % 25 === 0) console.log('[update]', JSON.stringify(status));
+        send('update:status', status);
+      },
+      getSettings: readSettings,
+      saveSettings: (patch) => writeSettings({ ...readSettings(), ...patch }),
+      installer,
+    });
+  }
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+});
+
+// An update that finished downloading is applied quietly when the app is closed, so the
+// next launch is already the new version even if "Restart to update" was never pressed.
+app.on('before-quit', (event) => {
+  if (!updater.hasStaged()) return;
+  event.preventDefault();
+  updater.apply(false);
 });
 
 app.on('window-all-closed', () => {

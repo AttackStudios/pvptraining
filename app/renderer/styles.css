@@ -75,6 +75,13 @@ body.win .titlebar { padding: 0 150px 0 18px; }
 .wordmark b { font-weight: 500; color: var(--text-2); }
 .titlebar-right { display: flex; align-items: center; gap: 10px; }
 
+.update-pill { display: inline-flex; align-items: center; gap: 7px; height: 26px; padding: 0 12px; border-radius: 99px; font-size: 11.5px; font-weight: 650; color: var(--text-2); background: rgba(255,255,255,0.05); border: 1px solid var(--line); cursor: default; -webkit-app-region: no-drag; transition: all 360ms var(--ease); animation: rise 520ms var(--ease) both; }
+.update-pill[hidden] { display: none; }
+.update-pill::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: var(--ember-2); animation: blink 1s ease-in-out infinite; }
+.update-pill.ready { cursor: pointer; color: #160a04; border-color: transparent; background: linear-gradient(135deg, var(--ember-2), var(--ember)); box-shadow: 0 8px 22px -10px var(--ember); }
+.update-pill.ready::before { background: #160a04; animation: none; }
+.update-pill.ready:hover { transform: translateY(-1px) scale(1.03); }
+
 .icon-btn { width: 28px; height: 28px; border-radius: 9px; display: grid; place-items: center; color: var(--text-2); -webkit-app-region: no-drag; transition: background 200ms ease, color 200ms ease, transform 240ms var(--spring); }
 .icon-btn:hover { background: var(--surface-2); color: var(--text); transform: scale(1.08); }
 .icon-btn svg { width: 16px; height: 16px; }
