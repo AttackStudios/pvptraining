@@ -3,7 +3,7 @@
   "productName": "PVPTraining",
   "version": "0.1.0",
   "private": true,
-  "description": "Combat masterclass for Minecraft 1.21.11: connects to your game and drops you into the practice world.",
+  "description": "PVPTraining",
   "author": "AttackStudios",
   "license": "MIT",
   "main": "src/main.js",

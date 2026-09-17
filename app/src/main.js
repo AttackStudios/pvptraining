@@ -8,6 +8,7 @@ const installer = require('./installer');
 
 const HOME_DIR = path.join(os.homedir(), '.pvptraining');
 const SHOTS = process.argv.includes('--shots');
+const APP_ICON = path.join(__dirname, 'app-icon.png');
 
 let win = null;
 let bridge = null;
@@ -57,6 +58,8 @@ function createWindow() {
     minHeight: 660,
     show: false,
     backgroundColor: '#0a0c11',
+    title: 'PVPTraining',
+    icon: APP_ICON,
     titleBarStyle: isMac ? 'hiddenInset' : 'hidden',
     trafficLightPosition: { x: 18, y: 18 },
     titleBarOverlay: isMac ? false : { color: '#00000000', symbolColor: '#9aa3b5', height: 44 },
@@ -167,7 +170,13 @@ function wireIpc() {
   ipcMain.handle('shell:openPath', (_e, p) => shell.openPath(p));
 }
 
+// Identity: without these a dev run shows up as "Electron" with the stock icon, and on
+// Windows the taskbar groups the window under Electron's app id instead of ours.
+app.setName('PVPTraining');
+if (process.platform === 'win32') app.setAppUserModelId('net.attackstudioyt.pvptraining');
+
 app.whenReady().then(() => {
+  if (process.platform === 'darwin' && app.dock) app.dock.setIcon(nativeImage.createFromPath(APP_ICON));
   wireIpc();
   createWindow();
   if (SHOTS) require('./shots').run(win);
