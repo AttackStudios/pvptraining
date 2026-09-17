@@ -65,6 +65,8 @@ public class PVPTrainingClient implements ClientModInitializer {
 		s.addProperty("modVersion", modVersion());
 		s.addProperty("practice", client.isIntegratedServerRunning() && Live.practiceWorld && client.player != null);
 		s.addProperty("inWorld", client.world != null);
+		// Single-player pauses when the window loses focus, which is exactly when the app is in front.
+		s.addProperty("paused", client.isPaused());
 		JsonObject session = Live.session;
 		if (session != null) s.add("session", session);
 		return s;

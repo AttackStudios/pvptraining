@@ -174,7 +174,8 @@ public abstract class Session {
 		return m;
 	}
 
-	private void publish() {
+	/** Pushes the current numbers to the app. Also called once at start so the app reacts before the first tick. */
+	void publish() {
 		JsonObject s = new JsonObject();
 		s.addProperty("mode", modeId);
 		s.addProperty("name", name());

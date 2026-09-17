@@ -319,7 +319,8 @@ const HERO_COPY = {
 
 function heroHtml() {
   const s = state.conn.state;
-  const [title, body] = HERO_COPY[s];
+  let [title, body] = HERO_COPY[s];
+  if ((s === 'live' && state.game.paused) || (s === 'ready' && state.pendingStart)) [title, body] = ['Ready. Switch back to Minecraft', 'The game pauses while this window is in front. Your session starts the moment you click back into Minecraft.'];
   const inst = state.conn.instance;
   const chips = [];
   if (inst) chips.push(`<span class="chip good">${esc(inst.username || 'Player')}</span>`, `<span class="chip">Minecraft ${esc(inst.mcVersion || '1.21.11')}</span>`);
@@ -488,6 +489,10 @@ function renderLaunch(root) {
       return;
     }
     api.bridge.send({ t: 'start', mode: mode.id, activity: pick.type, id: pick.id });
+    state.pendingStart = true;
+    setTimeout(() => {
+      state.pendingStart = false;
+    }, 60000);
     state.modeId = null;
     state.feed = [];
     renderPage();
@@ -700,6 +705,9 @@ function applyGameState(msg) {
   state.game.inWorld = Boolean(msg.practice);
   state.game.player = msg.player || state.game.player;
   state.game.session = msg.session || null;
+  if (state.game.session) state.pendingStart = false;
+  const wasPaused = state.game.paused;
+  state.game.paused = Boolean(msg.paused);
   const busy = ['connecting', 'entering', 'ready', 'live'].includes(state.conn.state);
   if (!busy) return;
   if (state.game.session) {
@@ -710,6 +718,7 @@ function applyGameState(msg) {
     setConn('entering');
     api.bridge.send({ t: 'enterWorld' });
   }
+  if (wasPaused !== state.game.paused && state.conn.state === 'live') refreshHero();
   if (hadSession !== Boolean(state.game.session) && state.page === 'train' && !state.modeId) renderPage();
   else updateLive();
 }

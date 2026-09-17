@@ -20,6 +20,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.ExplosionImpl;
 
 /**
  * Crystal PvP on real, breakable ground. The bot plays the kit the way a player does:
@@ -406,16 +407,21 @@ public class CrystalBrain extends BotBrain {
 		double toSelf = blastDamage(blast, bot, power);
 		boolean safe = bot.getOffHandStack().isOf(Items.TOTEM_OF_UNDYING) || toSelf * 0.3 < bot.getHealth() + bot.getAbsorptionAmount() - 3;
 		if (!safe) return -1;
+		// Only a Rookie takes a trade that hurts it more than the trainee.
+		if (skill.difficulty >= 4 && toSelf > toTarget) return -1;
 		// Better players care more about what a blast costs them, so they favour the far side of the target.
 		return toTarget - toSelf * skill.selfDamageWeight();
 	}
 
-	/** Vanilla explosion curve before armour. Exposure is treated as full. */
+	/**
+	 * Vanilla explosion curve before armour, including real line-of-sight exposure. Without
+	 * exposure the bot happily bombs a trainee who is safe in a crater while it stands in the open.
+	 */
 	private static double blastDamage(Vec3d at, LivingEntity who, float power) {
 		double reach = power * 2.0;
 		double dist = Math.sqrt(who.squaredDistanceTo(at)) / reach;
 		if (dist > 1) return 0;
-		double impact = 1.0 - dist;
+		double impact = (1.0 - dist) * ExplosionImpl.calculateReceivedDamage(at, who);
 		return (impact * impact + impact) / 2.0 * 7.0 * reach + 1.0;
 	}
 

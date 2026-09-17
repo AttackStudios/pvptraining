@@ -39,6 +39,7 @@ public final class SessionManager {
 			current = new DrillSession(player, modeId, drill);
 		}
 		current.start();
+		current.publish();
 		return null;
 	}
 
