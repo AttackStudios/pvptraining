@@ -46,6 +46,8 @@ public class CrystalBrain extends BotBrain {
 	private boolean targetHadTotem = true;
 	private int targetPoppedAt = -9999;
 	private int nextPearlAt;
+	private int nextHitCrystalAt;
+	private int comboUntil;
 	private int pearlAimTicks;
 	private Vec3d pearlAim;
 
@@ -69,6 +71,8 @@ public class CrystalBrain extends BotBrain {
 		pearlAimTicks = 0;
 		nextActionAt = age + 20;
 		nextPearlAt = age + 60;
+		nextHitCrystalAt = age + 40;
+		comboUntil = 0;
 	}
 
 	@Override
@@ -92,7 +96,9 @@ public class CrystalBrain extends BotBrain {
 		if (distanceToTarget() > 13 && bot.isOnGround() && throwPearl(target.getEntityPos())) return;
 
 		faceTarget();
-		approach(4.0, distanceToTarget() > 7);
+		// Normally it fights from crystal range; when a hit-crystal is due it steps in to sword range.
+		boolean wantsHit = age >= nextHitCrystalAt && skill.difficulty >= 3;
+		approach(wantsHit ? 2.4 : 4.0, distanceToTarget() > 7 || wantsHit);
 		dodgeBlasts(world);
 
 		if (pending != null && (pending.isRemoved() || !pending.isAlive())) pending = null;
@@ -110,10 +116,11 @@ public class CrystalBrain extends BotBrain {
 				return;
 			}
 		}
+		if (pending == null && wantsHit && tryHitCrystal()) return;
 		if (pending != null || age < nextActionAt) return;
 
 		// The moment a totem pops is the moment to hit again: skip the usual pacing.
-		boolean punish = age - targetPoppedAt < 16;
+		boolean punish = age - targetPoppedAt < 16 || age < comboUntil;
 
 		if (obsidianReady != null) {
 			BlockPos base = obsidianReady;
@@ -133,7 +140,7 @@ public class CrystalBrain extends BotBrain {
 		BlockPos needsObsidian = bestCrystalBase(world, true);
 		if (needsObsidian != null && placeBlock(world, needsObsidian, Items.OBSIDIAN, Blocks.OBSIDIAN.getDefaultState())) {
 			obsidianReady = needsObsidian;
-			nextActionAt = age + Math.max(1, skill.crystalPlaceDelay() / 2);
+			nextActionAt = age + (punish ? 1 : Math.max(1, skill.crystalPlaceDelay() / 2));
 			return;
 		}
 		if (startAnchor(world)) return;
@@ -142,6 +149,23 @@ public class CrystalBrain extends BotBrain {
 			bot.select(Items.NETHERITE_SWORD);
 			bot.hit(target);
 		}
+	}
+
+	/**
+	 * Hit-crystal: a sprint hit pops the trainee off the ground, then obsidian and a crystal go
+	 * in underneath while they are still in the air. An airborne player has nothing between the
+	 * blast and their legs, so the same crystal hurts far more than it would on the ground.
+	 */
+	private boolean tryHitCrystal() {
+		if (!target.isOnGround() || distanceToTarget() > 3.1 || !inReach(3.0)) return false;
+		if (bot.getAttackCooldownProgress(0.5F) < 0.95F || !canSee(target.getEyePos())) return false;
+		bot.select(Items.NETHERITE_SWORD);
+		bot.setSprinting(true);
+		bot.hit(target);
+		comboUntil = age + 12;
+		nextActionAt = age + 1 + skill.reactionTicks() / 3;
+		nextHitCrystalAt = age + 30 + Math.round((1 - skill.t) * 90) + random.nextInt(20);
+		return true;
 	}
 
 	/* ------------------------------------------------------------ awareness */
