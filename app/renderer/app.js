@@ -741,9 +741,25 @@ function applyGameState(msg) {
   else updateLive();
 }
 
+/** The mod in the game and this app are released together. An older mod still connects, but misses modes and fixes. */
+function warnIfModIsOld(modVersion) {
+  const parse = (v) => String(v || '').split('+')[0].split('.').map(Number);
+  const mod = parse(modVersion);
+  const mine = parse(state.info.version);
+  if (mod.some(Number.isNaN) || mod.length < 3) return;
+  for (let i = 0; i < 3; i++) {
+    if (mod[i] === mine[i]) continue;
+    if (mod[i] < mine[i]) {
+      setTimeout(() => toast(`The mod in your game is ${mod.join('.')}, this app is ${mine.join('.')}. Open Setup, then the install guide, to update the mod.`, 'bad'), 1800);
+    }
+    return;
+  }
+}
+
 function onMessage(msg) {
   if (msg.t === 'welcome') {
     state.game.player = msg.player;
+    warnIfModIsOld(msg.modVersion);
     setConn('entering');
     api.bridge.send({ t: 'enterWorld' });
     applyGameState(msg);
@@ -826,7 +842,12 @@ function wireUpdates() {
       pill.onclick = () => api.open(st.url);
     } else if (st.state === 'mod-updated') {
       pill.hidden = true;
-      toast(st.refreshed ? `Mod updated to ${st.version} in ${st.refreshed} folder${st.refreshed > 1 ? 's' : ''}. Restart Minecraft to use it.` : `Newer mod ${st.version} downloaded. Reinstall it from Setup.`, 'good');
+      toast(
+        st.refreshed
+          ? `Mod updated to ${st.version} in ${st.refreshed} folder${st.refreshed > 1 ? 's' : ''}. Restart Minecraft to use it.`
+          : `A newer mod (${st.version}) is ready. Open Setup, then the install guide, to put it in your mods folder.`,
+        'good'
+      );
       api.info().then((info) => (state.info = info));
     } else if (st.state === 'error') {
       pill.hidden = true;

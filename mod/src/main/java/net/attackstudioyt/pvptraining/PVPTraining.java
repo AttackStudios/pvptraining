@@ -14,6 +14,7 @@ import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.command.CommandSource;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.LivingEntity;
@@ -54,7 +55,12 @@ public class PVPTraining implements ModInitializer {
 			Live.session = null;
 		});
 		ServerTickEvents.END_SERVER_TICK.register(server -> {
-			if (Live.practiceWorld) SessionManager.tick();
+			if (!Live.practiceWorld) return;
+			SessionManager.tick();
+			if (signsDueAt >= 0 && server.getTicks() >= signsDueAt) {
+				signsDueAt = -1;
+				placeHubSigns(server);
+			}
 		});
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -64,6 +70,7 @@ public class PVPTraining implements ModInitializer {
 			player.getInventory().clear();
 			Vec3d hub = Arena.HUB.center();
 			player.teleport(server.getOverworld(), hub.x, hub.y, hub.z, Set.of(), 0, 0, true);
+			signsDueAt = server.getTicks() + 40; // once the hub chunk and its entities are loaded
 			player.sendMessage(Text.literal("PVPTraining: ").formatted(Formatting.GOLD).append(Text.literal("pick a drill or a duel in the app, or use /pvpt.").formatted(Formatting.GRAY)), false);
 		});
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
@@ -90,8 +97,18 @@ public class PVPTraining implements ModInitializer {
 			CommandManager.literal("pvpt")
 				.then(CommandManager.literal("start")
 					.then(CommandManager.argument("mode", StringArgumentType.word())
+						.suggests((ctx, b) -> CommandSource.suggestMatching(Catalog.get().modes.stream().map(m -> m.id), b))
 						.then(CommandManager.argument("activity", StringArgumentType.word())
-							.then(CommandManager.argument("id", StringArgumentType.word()).executes(ctx -> {
+							.suggests((ctx, b) -> CommandSource.suggestMatching(java.util.List.of("drill", "duel"), b))
+							.then(CommandManager.argument("id", StringArgumentType.word())
+								.suggests((ctx, b) -> {
+									// drills of the chosen mode, or the bot tiers for a duel
+									Catalog.Mode mode = Catalog.get().mode(StringArgumentType.getString(ctx, "mode"));
+									boolean duel = "duel".equals(StringArgumentType.getString(ctx, "activity"));
+									if (duel) return CommandSource.suggestMatching(Catalog.get().tiers.stream().map(t -> t.id), b);
+									return CommandSource.suggestMatching(mode == null ? java.util.stream.Stream.<String>empty() : mode.drills.stream().map(d -> d.id), b);
+								})
+								.executes(ctx -> {
 								ServerPlayerEntity p = ctx.getSource().getPlayerOrThrow();
 								if (!Live.practiceWorld) {
 									ctx.getSource().sendError(Text.literal("Open the PVPTraining world first (press Connect in the app)."));
@@ -105,6 +122,28 @@ public class PVPTraining implements ModInitializer {
 					SessionManager.stop();
 					return 1;
 				}))));
+	}
+
+	private static int signsDueAt = -1;
+
+	/**
+	 * Floating text in the hub, so someone who has just arrived knows what to do next. Replaced on
+	 * every join (old ones are removed first), which also keeps the wording current across updates.
+	 */
+	private static void placeHubSigns(MinecraftServer server) {
+		var source = server.getCommandSource().withSilent();
+		var commands = server.getCommandManager();
+		commands.parseAndExecute(source, "kill @e[type=minecraft:text_display,tag=pvpt_sign]");
+		String[][] lines = {
+			{ "105.2", "4", "{text:\"PVPTraining\",color:\"gold\",bold:true}" },
+			{ "103.9", "1.7", "{text:\"Pick a drill or a duel in the app\",color:\"white\"}" },
+			{ "103.2", "1.1", "{text:\"No app? /pvpt start mace drill mace_smash\",color:\"gray\"}" },
+			{ "102.7", "1.1", "{text:\"Your own hotbar: /kit edit mace, arrange it, /kit save main mace\",color:\"gray\"}" },
+		};
+		for (String[] l : lines) {
+			commands.parseAndExecute(source, "summon minecraft:text_display 0.5 " + l[0] + " 8.5 {Tags:[\"pvpt_sign\"],billboard:\"center\",background:0,shadow:1b,text:" + l[2]
+				+ ",transformation:{translation:[0f,0f,0f],left_rotation:[0f,0f,0f,1f],scale:[" + l[1] + "f," + l[1] + "f," + l[1] + "f],right_rotation:[0f,0f,0f,1f]}}");
+		}
 	}
 
 	private static ServerPlayerEntity sessionPlayer(Session s) {

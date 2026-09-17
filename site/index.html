@@ -198,7 +198,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   <h2>Get the app. The mod comes with it.</h2>
   <p class="sec-sub">The mod file is bundled inside the app, and the install guide hands it to you. It is also here on its own.</p>
   <div class="dl">
-    <div class="card reveal"><h3 style="margin-top:0">macOS</h3><p>Unzip and drag PVPTraining to Applications. First launch: right-click the app and choose Open. Pick Apple Silicon for M-series Macs, Intel for older ones.</p><a class="btn primary" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/PVPTraining-mac-arm64.zip">Apple Silicon</a><a class="btn" style="margin-top:10px" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/PVPTraining-mac-x64.zip">Intel</a></div>
+    <div class="card reveal"><h3 style="margin-top:0">macOS</h3><p>Unzip and drag PVPTraining to Applications. Apple Silicon is for M-series Macs, Intel for older ones. The app is not notarized, so the first launch is blocked once: see <a href="#mac-open" style="color:var(--ember2);font-weight:650">how to open it</a>.</p><a class="btn primary" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/PVPTraining-mac-arm64.zip">Apple Silicon</a><a class="btn" style="margin-top:10px" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/PVPTraining-mac-x64.zip">Intel</a></div>
     <div class="card reveal"><h3 style="margin-top:0">Windows</h3><p>64-bit installer for Windows 10 and 11. If SmartScreen appears, choose More info, then Run anyway. The app is not code-signed yet.</p><a class="btn primary" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/PVPTraining-win-x64.exe">Download for Windows</a></div>
     <div class="card reveal"><h3 style="margin-top:0">Mod only</h3><p>The Fabric mod jar by itself. Fabric API is inside it, so this one file is all your mods folder needs.</p><a class="btn" href="https://github.com/AttackStudios/pvptraining/releases/latest/download/pvptraining-mc1.21.11.jar">Download the jar</a></div>
   </div>
@@ -209,6 +209,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   <span class="eyebrow">FAQ</span>
   <h2>Good to know</h2>
   <div style="margin-top:26px">
+    <details id="mac-open"><summary>macOS says it cannot open PVPTraining. What now?</summary><p>That is macOS blocking an app that has not been notarized by Apple. Open it once so the warning appears, then go to <b>System Settings</b>, <b>Privacy &amp; Security</b>, scroll down and press <b>Open Anyway</b> next to PVPTraining. You only do this once. If you prefer Terminal: <code>xattr -dr com.apple.quarantine /Applications/PVPTraining.app</code>. Updates after that install themselves without asking again.</p></details>
+    <details><summary>Windows shows a blue "Windows protected your PC" box.</summary><p>That is SmartScreen reacting to an installer that is not code-signed yet. Press <b>More info</b>, then <b>Run anyway</b>. It installs for your user only and does not need admin rights.</p></details>
     <details><summary>Why only 1.21.11?</summary><p>The spear, Lunge and the current attribute-swap timing all live in 1.21.11, and the bots are written against that exact version. The mod refuses to load on anything else so you never train against wrong mechanics. More versions will follow, and the greyed-out version picker in the app becomes a real one when they do.</p></details>
     <details><summary>Will this get me banned anywhere?</summary><p>The mod does nothing on servers. It only acts inside its own single-player practice world. If a server or launcher forbids unknown mods, use a separate profile for training.</p></details>
     <details><summary>How does the app find my game?</summary><p>When Minecraft starts with the mod, it opens a connection that only this computer can reach and writes a small file with a one-time key into your user folder. The app reads that key to connect. Nothing leaves your machine.</p></details>
@@ -227,6 +229,8 @@ document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click'
   document.querySelectorAll('.tab').forEach(function(x){x.classList.toggle('on',x===t)});
   document.querySelectorAll('.panel').forEach(function(p){p.classList.toggle('on',p.id==='p-'+t.dataset.tab)});
 })});
+function openHash(){var el=location.hash&&document.querySelector(location.hash);if(el&&el.tagName==='DETAILS'){el.open=true;el.scrollIntoView({block:'center'})}}
+window.addEventListener('hashchange',openHash);openHash();
 var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
 document.querySelectorAll('.reveal').forEach(function(el,i){el.style.transitionDelay=(i%3)*70+'ms';io.observe(el)});
 (function(){var mac=/Mac/.test(navigator.platform||navigator.userAgent);var a=document.querySelector('.cta .primary');if(a)a.lastChild.textContent=mac?'Download for Mac':/Win/.test(navigator.platform||navigator.userAgent)?'Download for Windows':'Download'})();

@@ -1,7 +1,7 @@
 {
   "name": "pvptraining",
   "productName": "PVPTraining",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": true,
   "description": "PVPTraining",
   "author": "AttackStudios",
@@ -24,6 +24,7 @@
   },
   "build": {
     "appId": "net.attackstudioyt.pvptraining",
+    "afterPack": "tools/adhoc-sign.js",
     "productName": "PVPTraining",
     "copyright": "Copyright © 2026 AttackStudios",
     "directories": { "output": "release", "buildResources": "build" },

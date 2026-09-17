@@ -83,6 +83,9 @@ async function download(asset, dest, onProgress) {
 /* --------------------------------------------------------------------- mod */
 
 async function updateMod(release, settings, saveSettings, installer) {
+  // The app ships with the mod of its own version, so there is only something to pull when the
+  // release is newer than this app. (A fresh install must not "update" to the jar it came with.)
+  if (!newer(release.tag_name, app.getVersion())) return;
   const asset = release.assets.find((a) => a.name === ASSETS.jar);
   if (!asset) return;
   const current = settings.modUpdate;

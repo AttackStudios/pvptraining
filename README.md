@@ -17,6 +17,9 @@ Website and downloads: https://attackstudios.github.io/pvptraining/
 
 - **Mace**: tier-list style kit. Density V + Wind Burst mace, Breach IV mace, sword, axe, shield, wind charges, pearls, golden apples, totem, elytra with **no rockets**.
 - **Crystal**: netherite (Blast Protection legs), totems, end crystals, obsidian, anchors, glowstone, pearls, pickaxe.
+- **Sword**: diamond Protection III and a diamond sword. Drills for combos, W-tapping and crits; the bot W-taps, S-taps, strafes and crits.
+- **Cart**: TNT minecart PvP on breakable ground. Diamond Protection IV (Blast Protection legs), Power V Flame bow, rails, an inventory of TNT minecarts. A burning arrow detonates a TNT minecart instantly and blast power scales with arrow speed.
+- **X-Bow** (Cart branch): crossbow carting. Crossbows cannot have Flame, so the cart is set off by shooting a loaded crossbow through a flint-and-steel fire placed in front of it.
 - **Spear** (Mace branch): Mace kit without the elytra, plus a Lunge III netherite spear. Trains attribute swapping: select the spear and jab in the same tick so the lunge uses the previous item's charged cooldown.
 - **Elytra + Mace** (Mace branch): Mace kit plus rockets. Wings on, climb, turn, rocket down, wings off, smash.
 

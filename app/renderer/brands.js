@@ -27,7 +27,7 @@ export const BRANDS = {
       { title: 'Add the mod file', body: 'Pick your profile below and press <b>Install</b>. By hand: press the gear on the profile, then <b>Edit</b>, open the profile folder and drop the PVPTraining jar into <b>.minecraft/mods</b>.', jar: true, targets: true },
       { title: 'Launch the profile', body: 'Start the profile and wait for the title screen. Then come back here and press <b>Connect</b>.' },
     ],
-    note: 'Dawn is new, so button names may shift between updates. If you cannot find the profile folder, save the mod file with the button below and use Add content inside the profile editor.',
+    note: 'Dawn is new, so button names may shift between updates. If you cannot find the profile folder, press Save above to get the mod file, then use Add content inside the profile editor.',
   },
   lunar: {
     id: 'lunar',
